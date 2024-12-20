@@ -1,7 +1,6 @@
 #ifndef GRAFO_H
 #define GRAFO_H
 
-#include
 
 class grafo
 {
@@ -27,6 +26,8 @@ public:
     void novo_grafo(); //- função que lê um arquivo txt de configuracao e gera um grafo aleatorio
 };
 
+#endif
+
 grafo::grafo(/* args */)
 {
 
@@ -35,5 +36,3 @@ grafo::grafo(/* args */)
 grafo::~grafo()
 {
 }
-
-#endif

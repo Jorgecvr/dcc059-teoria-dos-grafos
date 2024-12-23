@@ -149,4 +149,72 @@ bool grafo_matriz::possui_ponte() {
 }
 
 void grafo_matriz::novo_grafo() {
+    int grau, ordem, direcionado, componentesConexas, verticesPonderados, arestasPonderadas;
+    bool completo, bipartido, arvore, arestaPonte, verticeArticulacao;
+
+    std::ifstream arquivo("Descricao.txt");
+    if (!arquivo.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo Descricao.txt" << std::endl;
+        return;
+    }
+
+    
+    arquivo >> grau;                 
+    arquivo >> ordem;                
+    arquivo >> direcionado;          
+    arquivo >> componentesConexas;   
+    arquivo >> verticesPonderados;   
+    arquivo >> arestasPonderadas;    
+    arquivo >> completo;             
+    arquivo >> bipartido;            
+    arquivo >> arvore;               
+    arquivo >> arestaPonte;          
+    arquivo >> verticeArticulacao;   
+
+    arquivo.close();
+
+    // Semente para números aleatórios
+    srand(time(0));
+
+    // Criar o arquivo de saída
+    std::ofstream arquivo_saida("grafo_aleatorio.txt");
+    if (!arquivo_saida.is_open()) {
+        std::cerr << "Erro ao criar o arquivo de saída" << std::endl;
+        return;
+    }
+
+    arquivo_saida << ordem << " " << direcionado << " " << verticesPonderados << " " << arestasPonderadas << std::endl;
+
+    // Gerar pesos para os vértices, se ponderados
+    if (verticesPonderados) {
+        for (int i = 0; i < ordem; ++i) {
+            arquivo_saida << rand() % 10 + 1 << " "; // Peso aleatório para o vértice
+        }
+        arquivo_saida << std::endl;
+    }
+
+    // Gerar arestas e seus pesos (se necessário), se houver arestas ponderadas
+    int arestas_max = (direcionado == 1) ? ordem * (ordem - 1) : ordem * (ordem - 1) / 2;
+    int arestas_geradas = 0;
+
+    // Gerar arestas aleatórias até o número máximo de arestas possíveis
+    while (arestas_geradas < grau && arestas_geradas < arestas_max) {
+        int origem = rand() % ordem + 1;
+        int destino = rand() % ordem + 1;
+
+        // Se o grafo for direcionado e a aresta já foi gerada, repetir
+        if (direcionado == 1 && origem == destino) continue; // evitar laços (se necessário)
+
+        // Se o grafo não for direcionado, evitamos duplicar as arestas (origem -> destino == destino -> origem)
+        if (direcionado == 0 && origem > destino) continue;
+
+        // Gerar peso para a aresta, se ponderada
+        int peso = arestasPonderadas ? rand() % 21 - 10 : 0; // Pesos entre -10 e 10, se ponderado
+
+        // Escrever aresta (origem, destino, peso)
+        arquivo_saida << origem << " " << destino << " " << peso << std::endl;
+        arestas_geradas++;
+    }
+
+    arquivo_saida.close();
 }

@@ -7,21 +7,15 @@
 
 using namespace std;
 
-grafo_matriz::grafo_matriz(int ordem, bool direcionado)
-    : ordem(ordem), direcionado(direcionado) {
-    // Inicializa o vetor linear para armazenar a representação triangular superior
-    matrizLinear.resize((ordem * (ordem + 1)) / 2, 0);  // Inicializa o vetor com 0 (sem arestas)
-
-    // Se o grafo for direcionado, aloca a matriz 2D
-    if (direcionado) {
-        matriz.resize(ordem, vector<int>(ordem, 0));  // Inicializa a matriz 2D com 0
-    }
+// Construtor sem parâmetros
+grafo_matriz::grafo_matriz() : ordem(0), direcionado(false) {
+    // Inicializa os membros sem alocar as matrizes
 }
 
 // Destruidor
 grafo_matriz::~grafo_matriz() {}
 
-// Função para calcular o índice do vetor linear
+// Função para calcular o índice no vetor linear
 int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
     if (origem <= destino) {
         // Cálculo para matriz triangular superior
@@ -30,7 +24,7 @@ int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
     return (origem * (origem - 1)) / 2 + destino - 1;
 }
 
-// Carrega o grafo do arquivo
+// Carrega o grafo a partir de um arquivo
 void grafo_matriz::carrega_grafo() {
     std::ifstream arquivo("Grafo.txt");
     if (!arquivo.is_open()) {
@@ -41,6 +35,7 @@ void grafo_matriz::carrega_grafo() {
     std::string linha;
     int num_vertices, direcionado, vertice_ponderado, aresta_ponderada;
 
+    // Lê a primeira linha com as configurações do grafo
     if (std::getline(arquivo, linha)) {
         std::istringstream iss(linha);
         iss >> num_vertices >> direcionado >> vertice_ponderado >> aresta_ponderada;
@@ -68,15 +63,29 @@ void grafo_matriz::carrega_grafo() {
 
         // Se o grafo for direcionado
         if (direcionado) {
-            matriz[origem - 1][destino - 1] = peso;
+            if(aresta_ponderada) {
+                matriz[origem - 1][destino - 1] = peso;
+            } else {
+                matriz[origem - 1][destino - 1] = 1;
+            }
         } else {
             // Se o grafo for não direcionado, usa o vetor linear
             int indice = calcularIndiceLinear(origem, destino);
-            matrizLinear[indice] = peso;
+
+            if (aresta_ponderada) {
+                matrizLinear[indice] = peso;
+            } else {
+                matrizLinear[indice] = 1;  // Se não for ponderado, coloca 1
+            }
 
             // Adiciona a aresta na direção inversa (não direcionado)
             int indiceInvertido = calcularIndiceLinear(destino, origem);
-            matrizLinear[indiceInvertido] = peso;
+
+            if (aresta_ponderada) {
+                matrizLinear[indiceInvertido] = peso;
+            } else {
+                matrizLinear[indiceInvertido] = 1;  // Se não for ponderado, coloca 1
+            }
         }
     }
 
@@ -84,7 +93,7 @@ void grafo_matriz::carrega_grafo() {
     std::cout << "Grafo carregado com sucesso!" << std::endl;
 }
 
-// Função para obter a matriz linear (não é mais uma matriz 2D)
+// Função para obter a matriz linear
 const std::vector<int>& grafo_matriz::get_matriz_linear() const {
     return matrizLinear;
 }
@@ -94,10 +103,7 @@ const std::vector<std::vector<int>>& grafo_matriz::get_matriz() const {
     return matriz;
 }
 
-
-
 // Implementações das funções restantes
-
 bool grafo_matriz::eh_bipartido() {
     return false;
 }
@@ -144,4 +150,3 @@ bool grafo_matriz::possui_ponte() {
 
 void grafo_matriz::novo_grafo() {
 }
-

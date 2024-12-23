@@ -12,6 +12,8 @@
 class grafo_matriz : public grafo {
 private:
     std::vector<std::vector<int>> matriz; // Matriz de adjacência
+    std::vector<int> matrizLinear;   // Representação linear da matriz de adjacência
+
     int ordem; // Número de vértices
     bool direcionado; // Se o grafo é direcionado
 
@@ -33,6 +35,8 @@ public:
     bool possui_ponte() override;
     void carrega_grafo() override;
     void novo_grafo() override;
+    const std::vector<int>& get_matriz_linear() const;
+    int calcularIndiceLinear(int origem, int destino);
 };
 
 #endif

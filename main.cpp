@@ -8,7 +8,8 @@ int main() {
     // Tenta carregar o grafo a partir de um arquivo
     grafo.carrega_grafo();
 
-    grafo.novo_grafo();
+    // grafo.novo_grafo();
+    std::cout << "GRAU:" << grafo.get_grau();
 
     // Verifica se o grafo foi carregado corretamente
     if (grafo.get_ordem() == 0) {

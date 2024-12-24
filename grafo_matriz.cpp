@@ -112,9 +112,44 @@ int grafo_matriz::n_conexo() {
     return 0;
 }
 
+// Função para calcular o maior grau
 int grafo_matriz::get_grau() {
-    return 0;
+    int grau_maximo = 0;
+
+    if (direcionado) {
+        // Grafo direcionado (matriz 2D)
+        for (int i = 0; i < ordem; ++i) {
+            int grau_saida = 0;
+            int grau_entrada = 0;
+            // Soma as conexões de saída (linha)
+            for (int j = 0; j < ordem; ++j) {
+                if (matriz[i][j] != 0) grau_saida++;
+            }
+            // Soma as conexões de entrada (coluna)
+            for (int j = 0; j < ordem; ++j) {
+                if (matriz[j][i] != 0) grau_entrada++;
+            }
+            int grau_vertice = grau_saida + grau_entrada;
+            grau_maximo = std::max(grau_maximo, grau_vertice);
+        }
+    } else {
+        // Grafo não direcionado (matriz linear)
+        for (int i = 0; i < ordem; ++i) {
+            int grau_vertice = 0;
+            // Conta as arestas de cada vértice
+            for (int j = i + 1; j < ordem; ++j) {
+                int indice = calcularIndiceLinear(i + 1, j + 1);  // Calcula o índice da aresta (1-indexed)
+                if (matrizLinear[indice] != 0) {
+                    grau_vertice++;
+                }
+            }
+            grau_maximo = std::max(grau_maximo, grau_vertice);
+        }
+    }
+    
+    return grau_maximo;
 }
+
 
 int grafo_matriz::get_ordem() {
     return ordem;

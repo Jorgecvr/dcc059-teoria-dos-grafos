@@ -2,13 +2,11 @@
 #include "grafo_matriz.h"  // Certifique-se de incluir o cabeçalho correto
 
 int main() {
-    // Cria um objeto grafo_matriz
-    grafo_matriz grafo;  // O grafo será criado com o construtor padrão
 
-    // Tenta carregar o grafo a partir de um arquivo
+    grafo_matriz grafo;  
+
     grafo.carrega_grafo();
 
-    // grafo.novo_grafo();
     std::cout << "GRAU:" << grafo.get_grau();
 
     // Verifica se o grafo foi carregado corretamente
@@ -44,6 +42,8 @@ int main() {
     }
 
     std::cout <<  "EH COMPLETO: " << grafo.eh_completo();
+    std::cout <<  "N conexo: " << grafo.n_conexo();
+
 
     return 0;
 }

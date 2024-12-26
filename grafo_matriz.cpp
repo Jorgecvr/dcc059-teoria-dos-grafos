@@ -116,7 +116,43 @@ bool grafo_matriz::eh_bipartido() {
 }
 
 int grafo_matriz::n_conexo() {
-    return 0;
+    vector<bool> visitado(ordem, false);  // Marca os vértices visitados
+    int componentes_conexas = 0;
+
+    // Função lambda para realizar a DFS
+    auto dfs = [&](int v, auto& dfs_ref) -> void {
+        visitado[v] = true;
+
+        if (direcionado) {
+            // Para grafos direcionados: percorre a linha v da matriz de adjacência
+            for (int u = 0; u < ordem; ++u) {
+                if (matriz[v][u] != 0 && !visitado[u]) {
+                    dfs_ref(u, dfs_ref);  // Chamando a recursão para o próximo vértice
+                }
+            }
+        } else {
+            // Para grafos não direcionados: percorre todas as arestas
+            // Deve percorrer os dois sentidos da aresta (v -> u e u -> v)
+            for (int u = 0; u < ordem; ++u) {
+                if (u != v) {  // Não deve visitar o próprio vértice
+                    int indice = calcularIndiceLinear(v + 1, u + 1);  // Calculando o índice da aresta
+                    if (matrizLinear[indice] != 0 && !visitado[u]) {
+                        dfs_ref(u, dfs_ref);  // Chamando a recursão para o próximo vértice
+                    }
+                }
+            }
+        }
+    };
+
+    // Percorre todos os vértices e realiza DFS para encontrar componentes conexas
+    for (int i = 0; i < ordem; ++i) {
+        if (!visitado[i]) {
+            componentes_conexas++;  // Inicia uma nova componente conexa
+            dfs(i, dfs);  // Realiza DFS a partir do vértice i
+        }
+    }
+
+    return componentes_conexas;
 }
 
 // Função para calcular o maior grau
@@ -156,7 +192,6 @@ int grafo_matriz::get_grau() {
     
     return grau_maximo;
 }
-
 
 int grafo_matriz::get_ordem() {
     return ordem;

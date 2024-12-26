@@ -12,8 +12,13 @@ grafo_matriz::grafo_matriz() : ordem(0), direcionado(false) {
     // Inicializa os membros sem alocar as matrizes
 }
 
-// Destruidor
+// Destrutor
 grafo_matriz::~grafo_matriz() {}
+
+// Variavel pra função ordem?
+int ordem;
+bool vtP;
+bool aTP;
 
 // Função para calcular o índice no vetor linear
 int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
@@ -39,7 +44,9 @@ void grafo_matriz::carrega_grafo() {
     if (std::getline(arquivo, linha)) {
         std::istringstream iss(linha);
         iss >> num_vertices >> direcionado >> vertice_ponderado >> aresta_ponderada;
-
+        ordem = num_vertices;
+        vtP = vertice_ponderado;
+        aTP = aresta_ponderada;
         this->ordem = num_vertices;
         this->direcionado = (direcionado == 1);
 
@@ -160,11 +167,13 @@ bool grafo_matriz::eh_direcionado() {
 }
 
 bool grafo_matriz::vertice_ponderado() {
-    return false;
+    std::cout << "Vértices ponderados: ";
+    return vtP;
 }
 
 bool grafo_matriz::aresta_ponderada() {
-    return false;
+    std::cout << "Arestas ponderados: ";
+    return aTP;
 }
 
 bool grafo_matriz::eh_completo() {

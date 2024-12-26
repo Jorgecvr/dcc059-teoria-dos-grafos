@@ -43,5 +43,7 @@ int main() {
         std::cout << std::endl;
     }
 
+    std::cout <<  grafo.vertice_ponderado();
+
     return 0;
 }

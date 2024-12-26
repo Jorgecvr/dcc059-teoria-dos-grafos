@@ -43,7 +43,7 @@ int main() {
         std::cout << std::endl;
     }
 
-    std::cout <<  grafo.vertice_ponderado();
+    std::cout <<  "EH COMPLETO: " << grafo.eh_completo();
 
     return 0;
 }

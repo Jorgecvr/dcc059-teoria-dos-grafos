@@ -15,7 +15,7 @@ grafo_matriz::grafo_matriz() : ordem(0), direcionado(false) {
 // Destrutor
 grafo_matriz::~grafo_matriz() {}
 
-// Variavel pra função ordem?
+// Variaveis pra copiar alguns valores para funções
 int ordem;
 bool vtP;
 bool aTP;
@@ -177,7 +177,31 @@ bool grafo_matriz::aresta_ponderada() {
 }
 
 bool grafo_matriz::eh_completo() {
-    return false;
+    if (direcionado) {
+        // Verifica matriz 2D para grafos direcionados
+        for (int i = 0; i < ordem; ++i) {
+            for (int j = 0; j < ordem; ++j) {
+                if (i != j && matriz[i][j] == 0) {
+                    // Se há um par de vértices (i, j) sem aresta, não é completo
+                    return false;
+                }
+            }
+        }
+    } else {
+        // Verifica vetor linear para grafos não direcionados
+        for (int i = 1; i <= ordem; ++i) {
+            for (int j = i + 1; j <= ordem; ++j) {
+                int indice = calcularIndiceLinear(i, j);
+                if (matrizLinear[indice] == 0) {
+                    // Se há um par de vértices sem conexão, não é completo
+                    return false;
+                }
+            }
+        }
+    }
+
+    // Se todas as condições foram satisfeitas, o grafo é completo
+    return true;
 }
 
 bool grafo_matriz::eh_arvore() {

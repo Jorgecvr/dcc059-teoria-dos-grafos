@@ -1,42 +1,30 @@
-#ifndef VERTICEENCADEADO_H
-#define VERTICEENCADEADO_H
+#ifndef VERTICEENCADEADO_H_INCLUDED
+#define VERTICEENCADEADO_H_INCLUDED
 
 #include <iostream>
 #include "ListaEncadeada.h"
-
-class ArestaEncadeada;
+#include "ArestaEncadeada.h"
 
 class VerticeEncadeado {
 private:
     int id;
-    float peso;
+    int peso;
     int grau;
+    VerticeEncadeado* proximo;
+    ListaEncadeada<ArestaEncadeada>* conexoes;
 
 public:
-    VerticeEncadeado(int id, float peso)
-        : id(id), peso(peso), grau(0) {}
+    VerticeEncadeado(int id, int peso);
 
+    int getId() const;
+    int getPeso() const;
+    int getGrau() const;
+    VerticeEncadeado* getProximo() const;
+    void setProximo(VerticeEncadeado* novoProximo);
+    void setConexao(VerticeEncadeado* verticeDestino, int pesoAresta);
+    ArestaEncadeada* getPrimeiraConexao();
 
-    int getId() const {
-        return id;
-    }
-
-    float getPeso() const {
-        return peso;
-    }
-
-    int getGrau() const {
-        return grau;
-    }
-
-
-
-    friend std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice) {
-        os << "VerticeEncadeado " << vertice.id << " (Peso: " << vertice.peso << ", Grau: " << vertice.grau << ")\n";
-        os << "Conexões: ";
-
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice);
 };
 
-#endif
+#endif // VERTICEENCADEADO_H_INCLUDED

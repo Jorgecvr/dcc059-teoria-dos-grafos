@@ -3,41 +3,45 @@
 
 #include <iostream>
 
-#include "No.h"
-
 using namespace std;
 
 template <typename T>
 
 class ListaEncadeada {
 private:
-    No<T>* inicio; 
+    T* primeiro;
+    T* ultimo;
+
 
 public:
-    ListaEncadeada() : inicio(nullptr) {}
+    ListaEncadeada() : primeiro(nullptr), ultimo(nullptr) {}
 
-
-    No<T>* getInicio() const {
-        return inicio;
+    T* getInicio() const {
+        return primeiro;
     }
 
-void adicionar(const T valor) {
-    No<T>* novoNo = new No<T>(valor, inicio);
-    inicio = novoNo;
-}
+    void adicionar(T* novoNo) {
+        if (primeiro == nullptr) {
+            primeiro = novoNo;
+            ultimo = novoNo;
+        } else {
+            ultimo->setProximo(novoNo);
+            ultimo = novoNo;
+        }
+    }
 
     void imprimir() const {
-        No<T>* atual = inicio;
+        T* atual = primeiro;
         while (atual != nullptr) {
-            cout << atual->getValor() << endl;
+            cout << *atual << endl;
             atual = atual->getProximo();
         }
     }
 
     ~ListaEncadeada() {
-        No<T>* atual = inicio;
+        T* atual = primeiro;
         while (atual != nullptr) {
-            No<T>* proximo = atual->getProximo();
+            T* proximo = atual->getProximo();
             delete atual;
             atual = proximo;
         }

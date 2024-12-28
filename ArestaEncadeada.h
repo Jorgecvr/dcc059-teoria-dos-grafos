@@ -1,44 +1,27 @@
-#ifndef ARESTAENCADEADA_H
-#define ARESTAENCADEADA_H
+#ifndef ARESTAENCADEADA_H_INCLUDED
+#define ARESTAENCADEADA_H_INCLUDED
 
 #include <iostream>
-#include "No.h"
-#include "VerticeEncadeado.h"
-
-using namespace std;
 
 class VerticeEncadeado;
 
 class ArestaEncadeada {
 private:
-    No<VerticeEncadeado>* origem;
-    No<VerticeEncadeado>* destino;
+    VerticeEncadeado* origem;
+    VerticeEncadeado* destino;
     int peso;
-    No<ArestaEncadeada>* proximo;
+    ArestaEncadeada* proximo;
 
 public:
-    ArestaEncadeada(No<VerticeEncadeado>* origem, No<VerticeEncadeado>* destino, int peso)
-        : origem(origem), destino(destino), peso(peso), proximo(nullptr) {}
+    ArestaEncadeada(VerticeEncadeado* origem, VerticeEncadeado* destino, int peso);
 
-    No<VerticeEncadeado>* getOrigem() const {
-        return origem;
-    }
+    VerticeEncadeado* getOrigem() const;
+    VerticeEncadeado* getDestino() const;
+    int getPeso() const;
+    ArestaEncadeada* getProximo() const;
+    void setProximo(ArestaEncadeada* novoProximo);
 
-    No<VerticeEncadeado>* getDestino() const {
-        return destino;
-    }
-
-    int getPeso() const {
-        return peso;
-    }
-
-    friend ostream& operator<<(ostream& os, const ArestaEncadeada& aresta) {
-        os << "Origem: " << aresta.origem->getValor().getId()
-            << ", Destino: " << aresta.destino->getValor().getId()
-            << ", Peso: " << aresta.peso;
-        return os;
-    }
+    friend std::ostream& operator<<(std::ostream& os, const ArestaEncadeada& aresta);
 };
 
 #endif
-

@@ -1,69 +1,82 @@
 #ifndef GRAFOLISTA_H
 #define GRAFOLISTA_H
 
+#include "Grafo.h"
 #include "ListaEncadeada.h"
 #include "VerticeEncadeado.h"
 #include "ArestaEncadeada.h"
 
+#include <iostream>
 
-using namespace std;
-
-class GrafoLista {
+class GrafoLista : public grafo {
 private:
     ListaEncadeada<VerticeEncadeado>* vertices;
     ListaEncadeada<ArestaEncadeada>* arestas;
 
-    No<VerticeEncadeado>* encontraVertice(int id) {
-        No<VerticeEncadeado>* primeiro = vertices->getInicio();
-        while (primeiro != nullptr) {
-            if (primeiro->getValor().getId() == id) {
-                return primeiro;
-            }
-            primeiro = primeiro->getProximo();
-        }
-        return nullptr;
-    }
+    VerticeEncadeado* encontraVertice(int id);
+
+    int ordem;
+    bool direcionado;
+    bool verticePonderado;
+    bool arestaPonderada;
+
+
 
 public:
-    GrafoLista() {
-        vertices = new ListaEncadeada<VerticeEncadeado>();
-        arestas = new ListaEncadeada<ArestaEncadeada>();
+    GrafoLista();
+
+    void adicionarVertice(int id, float peso);
+    void adicionarAresta(int origem, int destino, int peso);
+    void imprimir();
+
+    bool eh_bipartido() override;
+
+    int n_conexo() override;
+
+    int get_grau() override;
+
+    int get_ordem() override {
+        return ordem;
+    }
+    void aumenta_ordem() {
+        this->ordem++;
+    };
+
+    bool eh_direcionado() override {
+        return direcionado;
+    }
+    void set_eh_direcionado(bool direcionado) {
+        this->direcionado = direcionado;
+    };
+
+
+    bool vertice_ponderado() override {
+        return verticePonderado;
     }
 
-    void adicionarVertice(int id, float peso) {
+    void set_vertice_ponderado(bool verticePonderado) {
+        this->verticePonderado = verticePonderado;
+    };
 
-        if (encontraVertice(id) != nullptr) {
-            cout << "VerticeEncadeado com ID " << id << " ja existe!" << endl;
-            return;
-        }
-        VerticeEncadeado novoVertice(id, peso);
-        vertices->adicionar(novoVertice);
+    bool aresta_ponderada() override {
+        return arestaPonderada;
     }
+    void set_aresta_ponderada(bool arestaPonderada) {
+        this->arestaPonderada = arestaPonderada;
+    };
 
-    void adicionarAresta(int origem, int destino, int peso) {
-        No<VerticeEncadeado>* verticeOrigem = encontraVertice(origem);
-        No<VerticeEncadeado>* verticeDestino = encontraVertice(destino);
+    bool eh_completo() override;
 
-        if (verticeOrigem == nullptr || verticeDestino == nullptr) {
-            cout << "Erro: Um ou ambos os vértices não existem!" << endl;
-            return;
-        }
+    bool eh_arvore() override;
+    bool possui_articulacao() override;
+    bool possui_ponte() override;
 
-        ArestaEncadeada novaAresta(verticeOrigem, verticeDestino, peso);
-        arestas->adicionar(novaAresta);
-    }
+    void carrega_grafo() override;
+    void novo_grafo() override;
 
-    void imprimir() const {
-        cout << "Vertices:\n";
-        vertices->imprimir();
-        cout << "Arestas:\n";
-        arestas->imprimir();
-    }
+    void buscaEmProfundidade(VerticeEncadeado* vertice, bool* visitados);
 
-    ~GrafoLista() {
-        delete vertices;
-        delete arestas;
-    }
+    ~GrafoLista();
 };
 
 #endif

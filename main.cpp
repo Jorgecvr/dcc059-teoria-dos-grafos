@@ -1,20 +1,9 @@
 #include <iostream>
 
 #include "GrafoLista.h"
-#include "grafo_matriz"
+#include "grafo_matriz.h"
 
 int main() {
-    GrafoLista grafo;
-
-    grafo.adicionarVertice(1, 1.5);
-    grafo.adicionarVertice(2, 2.5);
-
-    grafo.adicionarAresta(1, 2, 10);
-
-    grafo.adicionarVertice(1, 3);
-
-    grafo.imprimir();
-
     grafo_matriz grafo;  
 
     grafo.carrega_grafo();
@@ -55,6 +44,29 @@ int main() {
 
     std::cout <<  "EH COMPLETO: " << grafo.eh_completo();
     std::cout <<  "N conexo: " << grafo.n_conexo();
+
+
+     GrafoLista grafo1;
+
+
+
+    //grafo1.adicionarVertice(1, 1.56);
+
+    //grafo1.adicionarVertice(2, 2.5);
+    //grafo1.adicionarVertice(2, 2.5);
+    //grafo1.adicionarVertice(3, 3);
+    //grafo1.adicionarVertice(4, 2);
+
+
+    //grafo1.adicionarAresta(1, 2, 100);
+    //grafo1.adicionarAresta(1, 4, 104);
+    //grafo1.adicionarAresta(3, 4, 106);
+    //grafo1.adicionarAresta(2, 4, 102);
+    //grafo1.adicionarAresta(4, 3, 102);
+
+    grafo1.carrega_grafo();
+
+    grafo1.imprimir();
 
 
     return 0;

@@ -76,6 +76,25 @@ void GrafoLista::carrega_grafo() {
 
     arquivo.close();
 }
+bool GrafoLista::possui_ponte(){
+    ArestaEncadeada *arestaAtual = aresta ->getinicio();
+
+    while(arestaAtual != nullptr){
+        VerticeEncadeado *origem = aresta->getOrigem();
+        VerticeEncadeado *destino = aresta->getDestino();
+
+        origem->removeConexao(destino);
+        if (!eh_direcionado()){
+            destino->removerConexao(origem);
+        }
+        
+
+    }
+
+
+
+}
+
 
 
 

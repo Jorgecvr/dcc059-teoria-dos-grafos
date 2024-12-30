@@ -115,6 +115,7 @@ bool grafo_matriz::eh_bipartido() {
     return false;
 }
 
+// Função n_conexo modificada
 int grafo_matriz::n_conexo() {
     vector<bool> visitado(ordem, false);  // Marca os vértices visitados
     int componentes_conexas = 0;
@@ -154,6 +155,7 @@ int grafo_matriz::n_conexo() {
 
     return componentes_conexas;
 }
+
 
 // Função para calcular o maior grau
 int grafo_matriz::get_grau() {

@@ -233,7 +233,13 @@ bool GrafoLista::eh_bipartido() {
 }
 
 bool GrafoLista::eh_arvore() {
+    bool *visitados = new bool[get_ordem()];
     return false;
+}
+
+bool eh_ciclico(VerticeEncadeado vertice_atual, bool visitados[], VerticeEncadeado pai)
+{
+    
 }
 
 bool GrafoLista::possui_articulacao() {

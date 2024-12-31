@@ -7,6 +7,8 @@
 #include "ArestaEncadeada.h"
 
 #include <iostream>
+#include <unordered_map>
+#include <queue>         
 
 class GrafoLista : public grafo {
 private:
@@ -70,7 +72,7 @@ public:
     bool eh_ciclico(VerticeEncadeado vertice_atual, bool visitados[], VerticeEncadeado pai);
     bool possui_articulacao() override;
     bool possui_ponte() override;
-
+    bool bfs_bipartido(VerticeEncadeado* inicio, std::unordered_map<int, int>& cor);
     void carrega_grafo() override;
     void novo_grafo() override;
 

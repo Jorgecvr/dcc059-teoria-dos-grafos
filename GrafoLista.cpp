@@ -5,6 +5,9 @@
 
 #include "GrafoLista.h"
 
+#include <unordered_map>
+#include <queue>  
+
 using namespace std;
 
 GrafoLista::GrafoLista() {
@@ -228,8 +231,41 @@ void GrafoLista::imprimir() {
 
 }
 
-bool GrafoLista::eh_bipartido() {
-    return false;
+bool eh_bipartido(VerticeEncadeado* inicio) {
+    if (!inicio) return true; // Um grafo vazio é considerado bipartido.
+
+    std::unordered_map<int, int> cores; // Mapeia ID do vértice para sua cor (0 ou 1).
+    std::queue<VerticeEncadeado*> fila;
+
+    fila.push(inicio);
+    cores[inicio->getId()] = 0; // Atribui a cor inicial ao primeiro vértice.
+
+    while (!fila.empty()) {
+        VerticeEncadeado* atual = fila.front();
+        fila.pop();
+
+        int corAtual = cores[atual->getId()];
+        ArestaEncadeada* aresta = atual->getPrimeiraConexao();
+
+        while (aresta) {
+            VerticeEncadeado* vizinho = aresta->getDestino();
+            int vizinhoId = vizinho->getId();
+
+            // Se o vizinho ainda não foi colorido, atribui a cor oposta.
+            if (cores.find(vizinhoId) == cores.end()) {
+                cores[vizinhoId] = 1 - corAtual;
+                fila.push(vizinho);
+            } 
+            // Se o vizinho já está colorido e tem a mesma cor, o grafo não é bipartido.
+            else if (cores[vizinhoId] == corAtual) {
+                return false;
+            }
+
+            aresta = aresta->getProximo();
+        }
+    }
+
+    return true; // Se percorremos todo o grafo sem conflitos, ele é bipartido.
 }
 
 bool GrafoLista::eh_arvore() {

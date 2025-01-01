@@ -3,33 +3,35 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <queue>
 #include "grafo_matriz.h"
 #include <ctime>
 
 using namespace std;
 
 // Construtor sem parâmetros
-grafo_matriz::grafo_matriz() : ordem(0), direcionado(false) {
-    // Inicializa os membros sem alocar as matrizes
-}
+grafo_matriz::grafo_matriz() : ordem(0), direcionado(false) {}
 
 // Destrutor
 grafo_matriz::~grafo_matriz() {}
 
-// Variaveis pra copiar alguns valores para funções
-int ordem;
-bool vtP;
-bool aTP;
-
 // Função para calcular o índice no vetor linear
 int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
     if (origem <= destino) {
-        // Cálculo para matriz triangular superior
         return (destino * (destino - 1)) / 2 + origem - 1;
     }
     return (origem * (origem - 1)) / 2 + destino - 1;
 }
 
+// Implementações das outras funções da classe
+
+bool grafo_matriz::possui_articulacao() {
+    return false; // Implementação mínima para evitar erros de compilação
+}
+
+bool grafo_matriz::possui_ponte() {
+    return false; // Implementação mínima para evitar erros de compilação
+}
 // Carrega o grafo a partir de um arquivo
 void grafo_matriz::carrega_grafo() {
     std::ifstream arquivo("Grafo.txt");
@@ -46,8 +48,8 @@ void grafo_matriz::carrega_grafo() {
         std::istringstream iss(linha);
         iss >> num_vertices >> direcionado >> vertice_ponderado >> aresta_ponderada;
         ordem = num_vertices;
-        vtP = vertice_ponderado;
-        aTP = aresta_ponderada;
+        int vtP = vertice_ponderado;
+        int aTP = aresta_ponderada;
         this->ordem = num_vertices;
         this->direcionado = (direcionado == 1);
 
@@ -78,7 +80,7 @@ void grafo_matriz::carrega_grafo() {
             }
         } else {
             // Se o grafo for não direcionado, usa o vetor linear
-            int indice = calcularIndiceLinear(origem, destino);
+            int indice = this->calcularIndiceLinear(origem, destino);
 
             if (aresta_ponderada) {
                 matrizLinear[indice] = peso;
@@ -87,7 +89,7 @@ void grafo_matriz::carrega_grafo() {
             }
 
             // Adiciona a aresta na direção inversa (não direcionado)
-            int indiceInvertido = calcularIndiceLinear(destino, origem);
+            int indiceInvertido = this->calcularIndiceLinear(destino, origem);
 
             if (aresta_ponderada) {
                 matrizLinear[indiceInvertido] = peso;
@@ -113,10 +115,62 @@ const std::vector<std::vector<int>>& grafo_matriz::get_matriz() const {
 
 // Implementações das funções restantes
 bool grafo_matriz::eh_bipartido() {
+    vector<int> cor(ordem, -1);
+    for (int i = 0; i < ordem; ++i) {
+        if (cor[i] == -1) {
+            if (!bfsBipartido(i, cor)) return false;
+        }
+    }
+    return true;
+}
+
+bool grafo_matriz::bfsBipartido(int inicio, vector<int>& cor) {
+    queue<int> fila;
+    cor[inicio] = 0;
+    fila.push(inicio);
+
+    while (!fila.empty()) {
+        int v = fila.front();
+        fila.pop();
+
+        for (int u = 0; u < ordem; ++u) {
+            if (matriz[v][u]) {
+                if (cor[u] == -1) {
+                    cor[u] = 1 - cor[v];
+                    fila.push(u);
+                } else if (cor[u] == cor[v]) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+bool grafo_matriz::eh_arvore() {
+    vector<bool> visitado(ordem, false);
+    if (this->temCiclo(0, -1, visitado)) return false; // Se há ciclo, não é uma árvore.
+    for (bool v : visitado) {
+        if (!v) return false; // Se algum vértice não foi visitado, o grafo não é conexo.
+    }
+    return true;
+}
+
+bool grafo_matriz::temCiclo(int v, int pai, vector<bool>& visitado) {
+    visitado[v] = true;
+
+    for (int u = 0; u < ordem; ++u) {
+        if (matriz[v][u]) { // Se existe uma aresta
+            if (!visitado[u]) {
+                if (this->temCiclo(u, v, visitado)) return true;
+            } else if (u != pai) {
+                return true;
+            }
+        }
+    }
     return false;
 }
 
-// Função n_conexo modificada
 int grafo_matriz::n_conexo() {
     vector<bool> visitado(ordem, false);  // Marca os vértices visitados
     int componentes_conexas = 0;
@@ -137,7 +191,7 @@ int grafo_matriz::n_conexo() {
             // Deve percorrer os dois sentidos da aresta (v -> u e u -> v)
             for (int u = 0; u < ordem; ++u) {
                 if (u != v) {  // Não deve visitar o próprio vértice
-                    int indice = calcularIndiceLinear(v + 1, u + 1);  // Calculando o índice da aresta
+                    int indice = this->calcularIndiceLinear(v + 1, u + 1);  // Calculando o índice da aresta
                     if (matrizLinear[indice] != 0 && !visitado[u]) {
                         dfs_ref(u, dfs_ref);  // Chamando a recursão para o próximo vértice
                     }
@@ -157,8 +211,6 @@ int grafo_matriz::n_conexo() {
     return componentes_conexas;
 }
 
-
-// Função para calcular o maior grau
 int grafo_matriz::get_grau() {
     int grau_maximo = 0;
 
@@ -184,7 +236,7 @@ int grafo_matriz::get_grau() {
             int grau_vertice = 0;
             // Conta as arestas de cada vértice
             for (int j = i + 1; j < ordem; ++j) {
-                int indice = calcularIndiceLinear(i + 1, j + 1);  // Calcula o índice da aresta (1-indexed)
+                int indice = this->calcularIndiceLinear(i + 1, j + 1);  // Calcula o índice da aresta (1-indexed)
                 if (matrizLinear[indice] != 0) {
                     grau_vertice++;
                 }
@@ -192,7 +244,7 @@ int grafo_matriz::get_grau() {
             grau_maximo = std::max(grau_maximo, grau_vertice);
         }
     }
-    
+
     return grau_maximo;
 }
 
@@ -206,12 +258,12 @@ bool grafo_matriz::eh_direcionado() {
 
 bool grafo_matriz::vertice_ponderado() {
     std::cout << "Vértices ponderados: ";
-    return vtP;
+    return this->vtp; // Use "this->" para acessar o atributo da classe
 }
 
 bool grafo_matriz::aresta_ponderada() {
-    std::cout << "Arestas ponderados: ";
-    return aTP;
+    std::cout << "Arestas ponderadas: ";
+    return this->atp; // Use "this->" para acessar o atributo da classe
 }
 
 bool grafo_matriz::eh_completo() {
@@ -229,7 +281,7 @@ bool grafo_matriz::eh_completo() {
         // Verifica vetor linear para grafos não direcionados
         for (int i = 1; i <= ordem; ++i) {
             for (int j = i + 1; j <= ordem; ++j) {
-                int indice = calcularIndiceLinear(i, j);
+                int indice = this->calcularIndiceLinear(i, j);
                 if (matrizLinear[indice] == 0) {
                     // Se há um par de vértices sem conexão, não é completo
                     return false;
@@ -240,18 +292,6 @@ bool grafo_matriz::eh_completo() {
 
     // Se todas as condições foram satisfeitas, o grafo é completo
     return true;
-}
-
-bool grafo_matriz::eh_arvore() {
-    return false;
-}
-
-bool grafo_matriz::possui_articulacao() {
-    return false;
-}
-
-bool grafo_matriz::possui_ponte() {
-    return false;
 }
 
 void grafo_matriz::novo_grafo() {

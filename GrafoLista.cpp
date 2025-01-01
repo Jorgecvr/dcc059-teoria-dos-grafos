@@ -2,24 +2,23 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-
 #include "GrafoLista.h"
-
 #include <unordered_map>
-#include <queue>  
+#include <queue>
 
 using namespace std;
 
+// Construtor
 GrafoLista::GrafoLista() {
     vertices = new ListaEncadeada<VerticeEncadeado>();
     arestas = new ListaEncadeada<ArestaEncadeada>();
-
+    ordem = 0; // Inicializa a ordem
+    direcionado = false;
+    verticePonderado = false;
+    arestaPonderada = false;
 }
 
-int ordem;
-bool vtp;
-bool atp;
-
+// Implementação da função para carregar o grafo
 void GrafoLista::carrega_grafo() {
     std::ifstream arquivo("Grafo.txt");
 
@@ -28,79 +27,35 @@ void GrafoLista::carrega_grafo() {
     }
 
     std::string linha;
-
-
     if (std::getline(arquivo, linha)) {
         std::istringstream iss(linha);
-        iss >> ordem >> direcionado >> vtp >> atp;
+        int direcionadoInput;
 
-        this->ordem = ordem;
-        set_eh_direcionado(direcionado);
-        set_vertice_ponderado(vtp);
-        set_aresta_ponderada(atp);
+        iss >> this->ordem >> direcionadoInput >> this->vTP >> this->aTP;
 
+        set_eh_direcionado(direcionadoInput);
+        set_vertice_ponderado(this->vTP);
+        set_aresta_ponderada(this->aTP);
     } else {
-        throw std::runtime_error("Arquivo vazio ou formato invalido na primeira linha.");
-    }
-    if (vertice_ponderado()) {
-        if (std::getline(arquivo, linha)) {
-            std::istringstream streamPesos(linha);
-            for (int i = 1; i <= ordem; i++) {
-                float pesoVertice;
-                if (streamPesos >> pesoVertice) {
-                    adicionarVertice(i, pesoVertice);
-                } else {
-                    throw std::runtime_error("Erro ao ler pesos dos vertices.");
-                }
-            }
-        } else {
-            throw std::runtime_error("Pesos dos vertices não encontrados em arquivo ponderado.");
-        }
-    } else {
-        for (int i = 1; i <= ordem; i++) {
-            adicionarVertice(i, 0);
-        }
+        throw std::runtime_error("Arquivo vazio ou formato inválido na primeira linha.");
     }
 
     while (std::getline(arquivo, linha)) {
         std::istringstream streamAresta(linha);
-        int origem, destino;
-        int peso = 0;
+        int origem, destino, peso = 0;
 
         if (streamAresta >> origem >> destino) {
             if (aresta_ponderada() && !(streamAresta >> peso)) {
                 throw std::runtime_error("Erro ao ler peso da aresta em grafo ponderado.");
             }
             adicionarAresta(origem, destino, peso);
-        } else {
-            throw std::runtime_error("Erro ao ler aresta (origem e destino).");
         }
     }
 
     arquivo.close();
 }
-bool GrafoLista::possui_ponte(){
-    ArestaEncadeada *arestaAtual = aresta ->getinicio();
 
-    while(arestaAtual != nullptr){
-        VerticeEncadeado *origem = aresta->getOrigem();
-        VerticeEncadeado *destino = aresta->getDestino();
-
-        origem->removeConexao(destino);
-        if (!eh_direcionado()){
-            destino->removerConexao(origem);
-        }
-        
-
-    }
-
-
-
-}
-
-
-
-
+// Função para encontrar um vértice pelo ID
 VerticeEncadeado* GrafoLista::encontraVertice(int id) {
     VerticeEncadeado* vertice = vertices->getInicio();
 
@@ -113,6 +68,7 @@ VerticeEncadeado* GrafoLista::encontraVertice(int id) {
     return nullptr;
 }
 
+// Função para adicionar um vértice
 void GrafoLista::adicionarVertice(int id, float peso) {
     if (encontraVertice(id) != nullptr) {
         cout << "VerticeEncadeado com ID " << id << " ja existe!" << endl;
@@ -122,6 +78,7 @@ void GrafoLista::adicionarVertice(int id, float peso) {
     vertices->adicionar(novoVertice);
 }
 
+// Função para adicionar uma aresta
 void GrafoLista::adicionarAresta(int origem, int destino, int peso) {
     ArestaEncadeada* atual = arestas->getInicio();
     while (atual != nullptr) {
@@ -143,17 +100,18 @@ void GrafoLista::adicionarAresta(int origem, int destino, int peso) {
     ArestaEncadeada* novaAresta = new ArestaEncadeada(verticeOrigem, verticeDestino, peso);
 
     verticeOrigem->setConexao(verticeDestino, peso);
-    if(!eh_direcionado())
+    if (!eh_direcionado())
         verticeDestino->setConexao(verticeOrigem, peso);
     arestas->adicionar(novaAresta);
 }
 
+// Função para calcular o maior grau
 int GrafoLista::get_grau() {
     VerticeEncadeado* atual = vertices->getInicio();
 
     int maiorGrau = 0;
     while (atual != nullptr) {
-        if(maiorGrau < atual->getGrau()) {
+        if (maiorGrau < atual->getGrau()) {
             maiorGrau = atual->getGrau();
         }
         atual = atual->getProximo();
@@ -162,16 +120,16 @@ int GrafoLista::get_grau() {
     return maiorGrau;
 }
 
+// Função para verificar se o grafo é completo
 bool GrafoLista::eh_completo() {
     if (ordem < 2) {
         return true;
     }
 
-
     VerticeEncadeado* v1 = vertices->getInicio();
 
-    while(v1 != nullptr) {
-        if(v1->getGrau() < get_ordem() - 1) {
+    while (v1 != nullptr) {
+        if (v1->getGrau() < get_ordem() - 1) {
             return false;
         }
         v1 = v1->getProximo();
@@ -180,6 +138,7 @@ bool GrafoLista::eh_completo() {
     return true;
 }
 
+// Busca em profundidade
 void GrafoLista::buscaEmProfundidade(VerticeEncadeado* vertice, bool* visitados) {
     visitados[vertice->getId()] = true;
 
@@ -193,8 +152,8 @@ void GrafoLista::buscaEmProfundidade(VerticeEncadeado* vertice, bool* visitados)
     }
 }
 
+// Função para calcular o número de componentes conexas
 int GrafoLista::n_conexo() {
-    int ordem = this->ordem;
     bool* visitados = new bool[ordem + 1];
     for (int i = 1; i <= ordem; i++) {
         visitados[i] = false;
@@ -216,66 +175,25 @@ int GrafoLista::n_conexo() {
     return componentes;
 }
 
-
-
+// Função para imprimir o grafo
 void GrafoLista::imprimir() {
-
     cout << "Vertices:\n";
     vertices->imprimir();
     cout << "Arestas:\n";
     arestas->imprimir();
     cout << "\n";
-    cout << "grau do grafo: " << get_grau() <<"\n";
-    cout << "Eh completo? " << eh_completo() <<"\n";
-    cout << "Quantidade de componente conexas: " <<n_conexo();
-
+    cout << "grau do grafo: " << get_grau() << "\n";
+    cout << "Eh completo? " << eh_completo() << "\n";
+    cout << "Quantidade de componente conexas: " << n_conexo();
 }
 
-bool eh_bipartido(VerticeEncadeado* inicio) {
-    if (!inicio) return true; // Um grafo vazio é considerado bipartido.
-
-    std::unordered_map<int, int> cores; // Mapeia ID do vértice para sua cor (0 ou 1).
-    std::queue<VerticeEncadeado*> fila;
-
-    fila.push(inicio);
-    cores[inicio->getId()] = 0; // Atribui a cor inicial ao primeiro vértice.
-
-    while (!fila.empty()) {
-        VerticeEncadeado* atual = fila.front();
-        fila.pop();
-
-        int corAtual = cores[atual->getId()];
-        ArestaEncadeada* aresta = atual->getPrimeiraConexao();
-
-        while (aresta) {
-            VerticeEncadeado* vizinho = aresta->getDestino();
-            int vizinhoId = vizinho->getId();
-
-            // Se o vizinho ainda não foi colorido, atribui a cor oposta.
-            if (cores.find(vizinhoId) == cores.end()) {
-                cores[vizinhoId] = 1 - corAtual;
-                fila.push(vizinho);
-            } 
-            // Se o vizinho já está colorido e tem a mesma cor, o grafo não é bipartido.
-            else if (cores[vizinhoId] == corAtual) {
-                return false;
-            }
-
-            aresta = aresta->getProximo();
-        }
-    }
-
-    return true; // Se percorremos todo o grafo sem conflitos, ele é bipartido.
-}
-
-bool GrafoLista::eh_arvore() {
-    bool *visitados = new bool[get_ordem()];
+// Implementações das funções virtuais puras
+bool GrafoLista::eh_bipartido() {
     return false;
 }
 
-bool eh_ciclico(VerticeEncadeado vertice_atual, bool visitados[], VerticeEncadeado pai)
-{
-    
+bool GrafoLista::eh_arvore() {
+    return false;
 }
 
 bool GrafoLista::possui_articulacao() {
@@ -287,9 +205,10 @@ bool GrafoLista::possui_ponte() {
 }
 
 void GrafoLista::novo_grafo() {
-
+    cout << "Novo grafo gerado." << endl;
 }
 
+// Destrutor
 GrafoLista::~GrafoLista() {
     delete vertices;
     delete arestas;

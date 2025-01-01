@@ -16,7 +16,8 @@ private:
     ListaEncadeada<ArestaEncadeada>* arestas;
 
     VerticeEncadeado* encontraVertice(int id);
-
+    bool vTP;
+    bool aTP;
     int ordem;
     bool direcionado;
     bool verticePonderado;

@@ -2,7 +2,7 @@
 #define GRAFO_MATRIZ_H
 
 #include <vector>
-#include "grafo.h"  
+#include "grafo.h"
 
 class grafo_matriz : public grafo {
 private:
@@ -10,7 +10,12 @@ private:
     std::vector<int> matrizLinear;               // Representação linear da matriz de adjacência (para grafos não direcionados)
 
     int ordem;                                  // Número de vértices no grafo
-    bool direcionado;                           // Indica se o grafo é direcionado ou não
+    bool direcionado; 
+    bool vtp;
+    bool atp;                         
+    // Funções auxiliares para as novas implementações
+    bool temCiclo(int v, int pai, std::vector<bool>& visitado); // Para verificar ciclos
+    bool bfsBipartido(int inicio, std::vector<int>& cor);       // Para verificar bipartição
 
 public:
     // Construtores e destrutores
@@ -36,7 +41,7 @@ public:
     bool eh_arvore() override;
     bool possui_articulacao() override;
     bool possui_ponte() override;
-    
+
     // Função para carregar o grafo a partir de um arquivo
     void carrega_grafo() override;
 

@@ -19,7 +19,7 @@ int VerticeEncadeado::getGrau() const {
 VerticeEncadeado* VerticeEncadeado::getProximo() const {
     return proximo;
 }
- 
+
 
 void VerticeEncadeado::setConexao(VerticeEncadeado* verticeDestino, int pesoAresta) {
 
@@ -34,10 +34,6 @@ void VerticeEncadeado::decrementarGrau() {
     }
 }
 
-/* template <typename T> 
-void ListaEncadeada<T>::setPrimeiro(T* novoPrimeiro) {
-    primeiro = novoPrimeiro;
-}
 
 
 void VerticeEncadeado::removerConexao(VerticeEncadeado* verticeDestino) {
@@ -48,7 +44,7 @@ void VerticeEncadeado::removerConexao(VerticeEncadeado* verticeDestino) {
         if (atual->getDestino() == verticeDestino) {
             if (anterior == nullptr) {
                 // Atualiza o início da lista (primeiro) usando setPrimeiro
-                conexoes->setPrimeiro(atual->getProximo());
+                conexoes->adicionarInicio(atual->getProximo());
             } else {
                 // Remove a conexão intermediária ou final
                 anterior->setProximo(atual->getProximo());
@@ -63,7 +59,6 @@ void VerticeEncadeado::removerConexao(VerticeEncadeado* verticeDestino) {
 
     std::cerr << "Erro: Conexao com o vertice " << verticeDestino->getId() << " nao encontrada.\n";
 }
-*/
 
 ArestaEncadeada* VerticeEncadeado::getPrimeiraConexao(){
 

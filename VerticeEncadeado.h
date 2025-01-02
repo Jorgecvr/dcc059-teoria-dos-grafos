@@ -27,7 +27,6 @@ public:
     ArestaEncadeada* getPrimeiraConexao();
 
     //rograma para fazer possui ponte funcionar
-    //void setPrimeiro(T* novoPrimeiro); //chamar o T da Lista encada//
     void decrementarGrau();
     void removerConexao(VerticeEncadeado* destino);
     void setInicio(ArestaEncadeada* novoInicio);

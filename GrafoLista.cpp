@@ -184,7 +184,8 @@ void GrafoLista::imprimir() {
     cout << "\n";
     cout << "grau do grafo: " << get_grau() << "\n";
     cout << "Eh completo? " << eh_completo() << "\n";
-    cout << "Quantidade de componente conexas: " << n_conexo();
+    cout << "Quantidade de componente conexas: " << n_conexo() << "\n";
+    cout << "Possui Ponte: " << possui_ponte();
 }
 
 bool GrafoLista::possui_ponte(){
@@ -202,11 +203,11 @@ bool GrafoLista::possui_ponte(){
         adicionarAresta(origem->getId(), destino->getId(), atual->getPeso());
         int componentesDepois = n_conexo(); // Número de componentes conexas depois de restaurar
         if (componentesDepois > componentesAntes) {
-            return true; 
+            return true;
         }
         atual = atual->getProximo();
     }
-    return false; 
+    return false;
 }
 
 

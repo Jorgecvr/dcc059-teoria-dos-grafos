@@ -187,36 +187,26 @@ void GrafoLista::imprimir() {
     cout << "Quantidade de componente conexas: " << n_conexo();
 }
 
-
-
-
-bool GrafoLista::possui_ponte() {
+bool GrafoLista::possui_ponte(){
     // Para cada aresta no grafo, verificamos se sua remoção aumenta o número de componentes conexas
     ArestaEncadeada* atual = arestas->getInicio();
-
     while (atual != nullptr) {
         // Removemos temporariamente a aresta
         VerticeEncadeado* origem = atual->getOrigem();
         VerticeEncadeado* destino = atual->getDestino();
-
         origem->removerConexao(destino);
-        if (!eh_direcionado()) {
+        if (!eh_direcionado()){
             destino->removerConexao(origem);
         }
-
         int componentesAntes = n_conexo(); // Número de componentes conexas antes
         adicionarAresta(origem->getId(), destino->getId(), atual->getPeso());
-
         int componentesDepois = n_conexo(); // Número de componentes conexas depois de restaurar
-
         if (componentesDepois > componentesAntes) {
-            return true; // Encontramos uma ponte
+            return true; 
         }
-
         atual = atual->getProximo();
     }
-
-    return false; // Nenhuma ponte encontrada
+    return false; 
 }
 
 

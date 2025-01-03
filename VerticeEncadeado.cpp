@@ -15,9 +15,11 @@ int VerticeEncadeado::getGrau() const {
     return grau;
 }
 
+
 VerticeEncadeado* VerticeEncadeado::getProximo() const {
     return proximo;
 }
+
 
 void VerticeEncadeado::setConexao(VerticeEncadeado* verticeDestino, int pesoAresta) {
 
@@ -26,12 +28,44 @@ void VerticeEncadeado::setConexao(VerticeEncadeado* verticeDestino, int pesoAres
     grau++;
 }
 
-ArestaEncadeada* VerticeEncadeado::getPrimeiraConexao() {
+void VerticeEncadeado::decrementarGrau() {
+    if (grau > 0) {
+        grau--;
+    }
+}
+
+
+
+void VerticeEncadeado::removerConexao(VerticeEncadeado* verticeDestino) {
+    ArestaEncadeada* atual = conexoes->getInicio();
+    ArestaEncadeada* anterior = nullptr;
+
+    while (atual != nullptr) {
+        if (atual->getDestino() == verticeDestino) {
+            if (anterior == nullptr) {
+                // Atualiza o início da lista (primeiro) usando setPrimeiro
+                conexoes->adicionarInicio(atual->getProximo());
+            } else {
+                // Remove a conexão intermediária ou final
+                anterior->setProximo(atual->getProximo());
+            }
+            delete atual;        // Libera memória da conexão
+            decrementarGrau();   // Atualiza o grau
+            return;
+        }
+        anterior = atual;
+        atual = atual->getProximo();
+    }
+
+    std::cerr << "Erro: Conexao com o vertice " << verticeDestino->getId() << " nao encontrada.\n";
+}
+
+ArestaEncadeada* VerticeEncadeado::getPrimeiraConexao(){
 
     return conexoes->getInicio();
 }
 
-void VerticeEncadeado::setProximo(VerticeEncadeado* novoProximo) {
+void VerticeEncadeado::setProximo(VerticeEncadeado* novoProximo){
     proximo = novoProximo;
 }
 
@@ -42,3 +76,4 @@ std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice) {
     vertice.conexoes->imprimir();
     return os;
 }
+

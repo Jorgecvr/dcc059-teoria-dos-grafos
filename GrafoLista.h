@@ -1,7 +1,7 @@
 #ifndef GRAFOLISTA_H
 #define GRAFOLISTA_H
 
-#include "Grafo.h"
+#include "grafo.h"
 #include "ListaEncadeada.h"
 #include "VerticeEncadeado.h"
 #include "ArestaEncadeada.h"
@@ -33,6 +33,8 @@ public:
 
     bool eh_bipartido() override;
 
+    void removerConexao(VerticeEncadeado* destino);
+    
     int n_conexo() override;
 
     int get_grau() override;

@@ -46,6 +46,11 @@ int main() {
     std::cout <<  "N conexo: " << grafo.n_conexo();
 
 
+    // Verifica articulação
+    std::cout <<std::endl;
+    std::cout << "O grafo possui articulação: " 
+              << (grafo.possui_articulacao() ? "Sim" : "Não") << std::endl;
+
     GrafoLista grafoLista;
 
 

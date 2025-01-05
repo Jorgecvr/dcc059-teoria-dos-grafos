@@ -69,7 +69,7 @@ public:
 
     bool eh_completo() override;
 
-    bool eh_arvore(VerticeEncadeado* verticeInicial) override;
+    bool eh_arvore(VerticeEncadeado* verticeInicial) /*override*/;
     bool possui_articulacao() override;
     bool possui_ponte() override;
     bool bfs_bipartido(VerticeEncadeado* inicio, std::unordered_map<int, int>& cor);

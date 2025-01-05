@@ -194,63 +194,118 @@ bool GrafoLista::eh_bipartido() {
     return false;
 }
 
+// Função para verificar se o grafo é uma árvore
 bool GrafoLista::eh_arvore(VerticeEncadeado* verticeInicial) {
-    // Verifica se o grafo é acíclico e conexo a partir do vertice inicial.
-    bool* visitados = new bool[get_ordem()];  // Array para marcar os vértices visitados.
+    bool* visitados = new bool[get_ordem()];
     for (int i = 0; i < get_ordem(); i++) {
-        visitados[i] = false;  // Inicializa todos como não visitados.
+        visitados[i] = false;
     }
 
-    // Flag para verificar se o grafo é acíclico.
     bool aciclico = true;
 
-    // Declara a função lambda antes de usá-la
     std::function<void(VerticeEncadeado*, VerticeEncadeado*)> buscaComVerificacaoDeCiclo;
 
-    // Define a função lambda
     buscaComVerificacaoDeCiclo = [&](VerticeEncadeado* vertice, VerticeEncadeado* pai) {
-        // Marca o vértice atual como visitado
         visitados[vertice->getId()] = true;
 
-        // Obtém a primeira conexão (aresta) do vértice atual
         ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
         
-        // Percorre todas as arestas do vértice atual
         while (aresta != nullptr) {
-            // Obtém o vértice de destino da aresta atual
             VerticeEncadeado* vizinho = aresta->getDestino();
 
-            // Se o vizinho ainda não foi visitado, chamamos a busca recursiva
             if (!visitados[vizinho->getId()]) {
                 buscaComVerificacaoDeCiclo(vizinho, vertice);
             }
-            // Se o vizinho já foi visitado e não é o "pai", encontramos um ciclo
             else if (vizinho != pai) {
-                aciclico = false;  // Encontramos um ciclo
+                aciclico = false;
             }
 
-            // Avança para a próxima aresta
             aresta = aresta->getProximo();
         }
     };
 
-    // Inicia a busca em profundidade a partir do vértice inicial.
     buscaComVerificacaoDeCiclo(verticeInicial, nullptr);
 
-    // Verifica se o grafo é conexo, ou seja, se todos os vértices foram visitados.
     for (int i = 0; i < get_ordem(); i++) {
         if (!visitados[i]) {
             delete[] visitados;
-            return false;  // Se algum vértice não foi visitado, o grafo não é conexo.
+            return false;
         }
     }
 
     delete[] visitados;
-    return aciclico;  // Retorna true se o grafo for acíclico e conexo.
+    return aciclico;
 }
 
 bool GrafoLista::possui_articulacao() {
-    return false;
+    int ordem = get_ordem();
+    bool* visitados = new bool[ordem];
+    int* discovery = new int[ordem];
+    int* low = new int[ordem];
+    int* parent = new int[ordem];
+    bool* articulacao = new bool[ordem];
+
+    for (int i = 0; i < ordem; i++) {
+        visitados[i] = false;
+        parent[i] = -1;
+        articulacao[i] = false;
+    }
+
+    int tempo = 0;
+
+    std::function<void(int)> dfsArticulacao = [&](int u) {
+        visitados[u] = true;
+        discovery[u] = low[u] = ++tempo;
+        int filhos = 0;
+
+        VerticeEncadeado* vertice = encontraVertice(u);  // Substituído por encontraVertice
+        ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
+
+        while (aresta != nullptr) {
+            int v = aresta->getDestino()->getId();
+
+            if (!visitados[v]) {
+                filhos++;
+                parent[v] = u;
+                dfsArticulacao(v);
+
+                low[u] = std::min(low[u], low[v]);
+
+                if (parent[u] == -1 && filhos > 1)
+                    articulacao[u] = true;
+
+                if (parent[u] != -1 && low[v] >= discovery[u])
+                    articulacao[u] = true;
+            }
+            else if (v != parent[u]) {
+                low[u] = std::min(low[u], discovery[v]);
+            }
+
+            aresta = aresta->getProximo();
+        }
+    };
+
+    for (int i = 0; i < ordem; i++) {
+        if (!visitados[i]) {
+            dfsArticulacao(i);
+        }
+    }
+
+    bool possuiArticulacao = false;
+    for (int i = 0; i < ordem; i++) {
+        if (articulacao[i]) {
+            possuiArticulacao = true;
+            break;
+        }
+    }
+
+    delete[] visitados;
+    delete[] discovery;
+    delete[] low;
+    delete[] parent;
+    delete[] articulacao;
+
+    return possuiArticulacao;
 }
 
 bool GrafoLista::possui_ponte() {

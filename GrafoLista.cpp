@@ -5,6 +5,8 @@
 #include "GrafoLista.h"
 #include <unordered_map>
 #include <queue>
+#include <functional>  // Necessário para usar std::function
+
 
 using namespace std;
 
@@ -218,12 +220,118 @@ bool GrafoLista::eh_bipartido() {
     return false;
 }
 
-bool GrafoLista::eh_arvore() {
-    return false;
+// Função para verificar se o grafo é uma árvore
+bool GrafoLista::eh_arvore(VerticeEncadeado* verticeInicial) {
+    bool* visitados = new bool[get_ordem()];
+    for (int i = 0; i < get_ordem(); i++) {
+        visitados[i] = false;
+    }
+
+    bool aciclico = true;
+
+    std::function<void(VerticeEncadeado*, VerticeEncadeado*)> buscaComVerificacaoDeCiclo;
+
+    buscaComVerificacaoDeCiclo = [&](VerticeEncadeado* vertice, VerticeEncadeado* pai) {
+        visitados[vertice->getId()] = true;
+
+        ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
+        
+        while (aresta != nullptr) {
+            VerticeEncadeado* vizinho = aresta->getDestino();
+
+            if (!visitados[vizinho->getId()]) {
+                buscaComVerificacaoDeCiclo(vizinho, vertice);
+            }
+            else if (vizinho != pai) {
+                aciclico = false;
+            }
+
+            aresta = aresta->getProximo();
+        }
+    };
+
+    buscaComVerificacaoDeCiclo(verticeInicial, nullptr);
+
+    for (int i = 0; i < get_ordem(); i++) {
+        if (!visitados[i]) {
+            delete[] visitados;
+            return false;
+        }
+    }
+
+    delete[] visitados;
+    return aciclico;
 }
 
 bool GrafoLista::possui_articulacao() {
-    return false;
+    int ordem = get_ordem();
+    bool* visitados = new bool[ordem];
+    int* discovery = new int[ordem];
+    int* low = new int[ordem];
+    int* parent = new int[ordem];
+    bool* articulacao = new bool[ordem];
+
+    for (int i = 0; i < ordem; i++) {
+        visitados[i] = false;
+        parent[i] = -1;
+        articulacao[i] = false;
+    }
+
+    int tempo = 0;
+
+    std::function<void(int)> dfsArticulacao = [&](int u) {
+        visitados[u] = true;
+        discovery[u] = low[u] = ++tempo;
+        int filhos = 0;
+
+        VerticeEncadeado* vertice = encontraVertice(u);  // Substituído por encontraVertice
+        ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
+
+        while (aresta != nullptr) {
+            int v = aresta->getDestino()->getId();
+
+            if (!visitados[v]) {
+                filhos++;
+                parent[v] = u;
+                dfsArticulacao(v);
+
+                low[u] = std::min(low[u], low[v]);
+
+                if (parent[u] == -1 && filhos > 1)
+                    articulacao[u] = true;
+
+                if (parent[u] != -1 && low[v] >= discovery[u])
+                    articulacao[u] = true;
+            }
+            else if (v != parent[u]) {
+                low[u] = std::min(low[u], discovery[v]);
+            }
+
+            aresta = aresta->getProximo();
+        }
+    };
+
+    for (int i = 0; i < ordem; i++) {
+        if (!visitados[i]) {
+            dfsArticulacao(i);
+        }
+    }
+
+    bool possuiArticulacao = false;
+    for (int i = 0; i < ordem; i++) {
+        if (articulacao[i]) {
+            possuiArticulacao = true;
+            break;
+        }
+    }
+
+    delete[] visitados;
+    delete[] discovery;
+    delete[] low;
+    delete[] parent;
+    delete[] articulacao;
+
+    return possuiArticulacao;
 }
 
 void GrafoLista::novo_grafo() {

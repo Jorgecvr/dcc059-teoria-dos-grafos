@@ -3,15 +3,11 @@
 
 #include <iostream>
 
-using namespace std;
-
 template <typename T>
-
 class ListaEncadeada {
 private:
     T* primeiro;
     T* ultimo;
-
 
 public:
     ListaEncadeada() : primeiro(nullptr), ultimo(nullptr) {}
@@ -33,7 +29,7 @@ public:
     void imprimir() const {
         T* atual = primeiro;
         while (atual != nullptr) {
-            cout << *atual << endl;
+            std::cout << *atual << std::endl;
             atual = atual->getProximo();
         }
     }

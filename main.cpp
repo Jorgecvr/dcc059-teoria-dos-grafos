@@ -1,73 +1,47 @@
 #include <iostream>
-
-#include "GrafoLista.h"
 #include "grafo_matriz.h"
+#include "GrafoLista.h"
+
+using namespace std;
 
 int main() {
-    grafo_matriz grafo;  
+    grafo_matriz grafo;
+
+    cout << "=== Testando Grafo com Matriz ===" << endl;
 
     grafo.carrega_grafo();
 
-    std::cout << "GRAU:" << grafo.get_grau();
+    cout << "Grau maximo do grafo: " << grafo.get_grau() << endl;
+    cout << "Numero de vertices: " << grafo.get_ordem() << endl;
 
-    // Verifica se o grafo foi carregado corretamente
-    if (grafo.get_ordem() == 0) {
-        std::cerr << "Erro: O grafo não foi carregado corretamente." << std::endl;
-        return 1;  // Retorna um código de erro
-    }
+    cout << "O grafo e " << (grafo.eh_direcionado() ? "direcionado" : "nao direcionado") << "." << endl;
 
-    // Exibe a ordem do grafo
-    std::cout << "Número de vértices: " << grafo.get_ordem() << std::endl;
-
-    // Verifica se o grafo é direcionado ou não
-    std::cout << "O grafo é " << (grafo.eh_direcionado() ? "direcionado" : "não direcionado") << "." << std::endl;
-
-    // Exibe a matriz de adjacência (se o grafo for direcionado)
-    std::cout << "Matriz de Adjacência:" << std::endl;
-    const auto& matriz = grafo.get_matriz();
-    for (const auto& linha : matriz) {
-        for (int valor : linha) {
-            std::cout << valor << " ";
+    if (grafo.eh_direcionado()) {
+        cout << "Matriz de Adjacencia:" << endl;
+        int** matriz = grafo.get_matriz();
+        for (int i = 0; i < grafo.get_ordem(); ++i) {
+            for (int j = 0; j < grafo.get_ordem(); ++j) {
+                cout << matriz[i][j] << " ";
+            }
+            cout << endl;
         }
-        std::cout << std::endl;
-    }
-
-    // Caso o grafo seja não direcionado, exibe a matriz linear
-    if (!grafo.eh_direcionado()) {
-        std::cout << "Matriz Linear:" << std::endl;
-        const auto& matrizLinear = grafo.get_matriz_linear();
-        for (size_t i = 0; i < matrizLinear.size(); ++i) {
-            std::cout << matrizLinear[i] << " ";
+    } else {
+        cout << "Matriz Linear:" << endl;
+        int* matrizLinear = grafo.get_matriz_linear();
+        int tamanho = (grafo.get_ordem() * (grafo.get_ordem() + 1)) / 2;
+        for (int i = 0; i < tamanho; ++i) {
+            cout << matrizLinear[i] << " ";
         }
-        std::cout << std::endl;
+        cout << endl;
     }
 
-    std::cout <<  "EH COMPLETO: " << grafo.eh_completo();
-    std::cout <<  "N conexo: " << grafo.n_conexo();
+    cout << "O grafo e completo? " << (grafo.eh_completo() ? "Sim" : "Nao") << endl;
+    cout << "Numero de componentes conexas: " << grafo.n_conexo() << endl;
 
-
-     GrafoLista grafo1;
-
-
-
-    //grafo1.adicionarVertice(1, 1.56);
-
-    //grafo1.adicionarVertice(2, 2.5);
-    //grafo1.adicionarVertice(2, 2.5);
-    //grafo1.adicionarVertice(3, 3);
-    //grafo1.adicionarVertice(4, 2);
-
-
-    //grafo1.adicionarAresta(1, 2, 100);
-    //grafo1.adicionarAresta(1, 4, 104);
-    //grafo1.adicionarAresta(3, 4, 106);
-    //grafo1.adicionarAresta(2, 4, 102);
-    //grafo1.adicionarAresta(4, 3, 102);
-
-    grafo1.carrega_grafo();
-
-    grafo1.imprimir();
-
+    GrafoLista grafoLista;
+    grafoLista.carrega_grafo();
+    cout << "\n=== Testando Grafo com Lista ===" << endl;
+    grafoLista.imprimir();
 
     return 0;
 }

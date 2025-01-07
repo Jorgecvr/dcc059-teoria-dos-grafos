@@ -1,35 +1,29 @@
 #ifndef GRAFO_MATRIZ_H
 #define GRAFO_MATRIZ_H
 
-#include <vector>
+#include <string>
+
 #include "grafo.h"
 
 class grafo_matriz : public grafo {
 private:
-    std::vector<std::vector<int>> matriz;        // Matriz de adjacência 2D (para grafos direcionados)
-    std::vector<int> matrizLinear;               // Representação linear da matriz de adjacência (para grafos não direcionados)
-
-    int ordem;                                  // Número de vértices no grafo
-    bool direcionado; 
+    int** matriz;           
+    int* matrizLinear;      
+    int ordem;              
+    bool direcionado;
     bool vtp;
-    bool atp;                         
-    // Funções auxiliares para as novas implementações
-    bool temCiclo(int v, int pai, std::vector<bool>& visitado); // Para verificar ciclos
-    bool bfsBipartido(int inicio, std::vector<int>& cor);       // Para verificar bipartição
+    bool atp;
+
+    bool temCiclo(int v, int pai, bool* visitado); 
+    bool bfsBipartido(int inicio, int* cor);       
+    void inicializarMatrizes();                   
 
 public:
-    // Construtores e destrutores
-    grafo_matriz();                             // Construtor padrão
-    ~grafo_matriz();                            // Destruidor
+    grafo_matriz();
+    ~grafo_matriz();
 
-    // Métodos para acessar as representações do grafo
-    const std::vector<std::vector<int>>& get_matriz() const;  // Retorna a matriz 2D de adjacência
-    const std::vector<int>& get_matriz_linear() const;        // Retorna a matriz linear
-
-    // Função para calcular o índice no vetor linear
     int calcularIndiceLinear(int origem, int destino);
 
-    // Sobrecarga das funções da classe base 'grafo'
     bool eh_bipartido() override;
     int n_conexo() override;
     int get_grau() override;
@@ -42,11 +36,10 @@ public:
     bool possui_articulacao() override;
     bool possui_ponte() override;
 
-    // Função para carregar o grafo a partir de um arquivo
     void carrega_grafo() override;
-
-    // Função para criar um novo grafo
     void novo_grafo() override;
+    int** get_matriz();
+    int* get_matriz_linear();
 };
 
-#endif  // GRAFO_MATRIZ_H
+#endif

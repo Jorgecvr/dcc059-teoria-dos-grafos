@@ -100,11 +100,116 @@ bool GrafoLista::eh_completo() {
 }
 
 bool GrafoLista::eh_arvore() {
-    return false;
+    int ordem = get_ordem();
+    if (ordem == 0) return false;
+
+    bool* visitados = new bool[ordem];
+    for (int i = 0; i < ordem; ++i) {
+        visitados[i] = false;
+    }
+
+    bool aciclico = true;
+
+    auto dfs = [&](VerticeEncadeado* vertice, VerticeEncadeado* pai, auto& dfsRef) -> void {
+        visitados[vertice->getId()] = true;
+
+        ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
+        while (aresta != nullptr) {
+            VerticeEncadeado* vizinho = aresta->getDestino();
+
+            if (!visitados[vizinho->getId()]) {
+                dfsRef(vizinho, vertice, dfsRef);
+            } else if (vizinho != pai) {
+                aciclico = false;
+            }
+
+            aresta = aresta->getProximo();
+        }
+    };
+
+    VerticeEncadeado* verticeInicial = encontraVertice(0);
+    dfs(verticeInicial, nullptr, dfs);
+
+    for (int i = 0; i < ordem; ++i) {
+        if (!visitados[i]) {
+            delete[] visitados;
+            return false;
+        }
+    }
+
+    delete[] visitados;
+    return aciclico;
 }
 
 bool GrafoLista::possui_articulacao() {
-    return false;
+    int ordem = get_ordem();
+    if (ordem == 0) return false;
+
+    bool* visitados = new bool[ordem];
+    int* discovery = new int[ordem];
+    int* low = new int[ordem];
+    int* parent = new int[ordem];
+    bool* articulacao = new bool[ordem];
+
+    for (int i = 0; i < ordem; i++) {
+        visitados[i] = false;
+        parent[i] = -1;
+        articulacao[i] = false;
+    }
+
+    int tempo = 0;
+
+    auto dfsArticulacao = [&](VerticeEncadeado* vertice, auto& dfsArticulacaoRef) -> void {
+        int u = vertice->getId();
+        visitados[u] = true;
+        discovery[u] = low[u] = ++tempo;
+        int filhos = 0;
+
+        ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
+        while (aresta != nullptr) {
+            VerticeEncadeado* vizinho = aresta->getDestino();
+            int v = vizinho->getId();
+
+            if (!visitados[v]) {
+                filhos++;
+                parent[v] = u;
+                dfsArticulacaoRef(vizinho, dfsArticulacaoRef);
+
+                low[u] = std::min(low[u], low[v]);
+
+                if (parent[u] == -1 && filhos > 1)
+                    articulacao[u] = true;
+                if (parent[u] != -1 && low[v] >= discovery[u])
+                    articulacao[u] = true;
+            } else if (v != parent[u]) {
+                low[u] = std::min(low[u], discovery[v]);
+            }
+
+            aresta = aresta->getProximo();
+        }
+    };
+
+    for (int i = 0; i < ordem; i++) {
+        if (!visitados[i]) {
+            dfsArticulacao(encontraVertice(i), dfsArticulacao);
+        }
+    }
+
+    bool possuiArticulacao = false;
+    for (int i = 0; i < ordem; i++) {
+        if (articulacao[i]) {
+            possuiArticulacao = true;
+            break;
+        }
+    }
+
+    delete[] visitados;
+    delete[] discovery;
+    delete[] low;
+    delete[] parent;
+    delete[] articulacao;
+
+    return possuiArticulacao;
 }
 
 bool GrafoLista::possui_ponte() {

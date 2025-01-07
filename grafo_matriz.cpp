@@ -25,9 +25,49 @@ int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
 
 // Implementações das outras funções da classe
 
-bool grafo_matriz::possui_articulacao() {
-    return false; // Implementação mínima para evitar erros de compilação
+
+
+bool grafo_matriz::possui_articulacao(){
+    // Função auxiliar para realizar uma DFS e contar componentes alcançáveis
+    auto dfs = [&](int v, vector<bool>& visitado, auto& dfs_ref) -> void{
+        visitado[v] = true;
+
+        if (direcionado){
+            for (int j = 0; j < ordem; j++){
+                if (matriz[v][j] != 0 && !visitado[j]){
+                    dfs_ref(j, visitado, dfs_ref);
+                }
+            }
+        }else{
+            for (int u = 0; u < ordem; u++){
+                if (u != v){
+                    int indice = calcularIndiceLinear(v + 1, u + 1);
+                    if (matrizLinear[indice] != 0 && !visitado[u]){
+                        dfs_ref(u, visitado, dfs_ref);
+                    }
+                }
+            }
+        }
+    };
+    for (int vertice = 0; vertice < ordem; vertice++){
+        // Marca todos os vértices como não visitados, exceto o removido
+        vector<bool> visitado(ordem, false);
+        visitado[vertice] = true; 
+
+        // Inicia a DFS a partir do primeiro vértice não removido
+        int inicio = (vertice == 0) ? 1 : 0;
+        dfs(inicio, visitado, dfs);
+
+        // Verifica se todos os vértices foram visitados
+        for (int i = 0; i < ordem; i++){
+            if (!visitado[i]) {
+                return true; 
+            }
+        }
+    }
+    return false;
 }
+
 
 bool grafo_matriz::possui_ponte() {
     return false; // Implementação mínima para evitar erros de compilação

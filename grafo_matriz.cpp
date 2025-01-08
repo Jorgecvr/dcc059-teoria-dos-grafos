@@ -72,8 +72,8 @@ void grafo_matriz::carrega_grafo() {
         } else {
             int indice = calcularIndiceLinear(origem, destino);
             matrizLinear[indice] = peso;
-            matriz[origem - 1][destino - 1] = peso;
-            matriz[destino - 1][origem - 1] = peso;
+            // matriz[origem - 1][destino - 1] = peso;
+            // matriz[destino - 1][origem - 1] = peso;
         }
     }
 

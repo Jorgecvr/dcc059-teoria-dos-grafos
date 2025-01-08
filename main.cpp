@@ -1,75 +1,90 @@
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
 
-#include "GrafoLista.h"
+#include "grafo.h"
 #include "grafo_matriz.h"
+#include "GrafoLista.h"
 
-int main() {
-    grafo_matriz grafo;
+void imprimirDescricaoGrafo(grafo* graph) {
+    std::cout << "Grau: " << graph->get_grau() << std::endl;
+    std::cout << "Ordem: " << graph->get_ordem() << std::endl;
+    std::cout << "Direcionado: " << (graph->eh_direcionado() ? "Sim" : "Não") << std::endl;
+    std::cout << "Componentes conexas: " << graph->n_conexo() << std::endl;
+    std::cout << "Vertices ponderados: " << (graph->vertice_ponderado() ? "Sim" : "Não") << std::endl;
+    std::cout << "Arestas ponderadas: " << (graph->aresta_ponderada() ? "Sim" : "Não") << std::endl;
+    std::cout << "Completo: " << (graph->eh_completo() ? "Sim" : "Não") << std::endl;
+    std::cout << "Bipartido: " << (graph->eh_bipartido() ? "Sim" : "Não") << std::endl;
+    std::cout << "Arvore: " << (graph->eh_arvore() ? "Sim" : "Não") << std::endl;
+    std::cout << "Aresta Ponte: " << (graph->possui_ponte() ? "Sim" : "Não") << std::endl;
+    std::cout << "Vertice de Articulacao: " << (graph->possui_articulacao() ? "Sim" : "Não") << std::endl;
+}
 
-    grafo.carrega_grafo();
+void carregarGrafo(const std::string &caminhoArquivo, bool usarMatriz) {
+    grafo* graph;
+    if (usarMatriz) {
+        graph = new grafo_matriz();
+    } else {
+        //graph = new GrafoLista();
+    }
+    graph->carrega_grafo();
+    imprimirDescricaoGrafo(graph);
+    delete graph;
+}
 
-    std::cout << "GRAU:" << grafo.get_grau();
-
-    // Verifica se o grafo foi carregado corretamente
-    if (grafo.get_ordem() == 0) {
-        std::cerr << "Erro: O grafo não foi carregado corretamente." << std::endl;
-        return 1;  // Retorna um código de erro
+void criarGrafo(const std::string &caminhoDescricao, const std::string &caminhoSaida, bool usarMatriz) {
+    grafo* graph;
+    if (usarMatriz) {
+        graph = new grafo_matriz();
+    } else {
+        //graph = new GrafoLista();
     }
 
-    // Exibe a ordem do grafo
-    std::cout << "Número de vértices: " << grafo.get_ordem() << std::endl;
 
-    // Verifica se o grafo é direcionado ou não
-    std::cout << "O grafo é " << (grafo.eh_direcionado() ? "direcionado" : "não direcionado") << "." << std::endl;
+    graph->novo_grafo();
 
-    // Exibe a matriz de adjacência (se o grafo for direcionado)
-    std::cout << "Matriz de Adjacência:" << std::endl;
-    const auto& matriz = grafo.get_matriz();
-    for (const auto& linha : matriz) {
-        for (int valor : linha) {
-            std::cout << valor << " ";
+    
+    delete graph;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 4) {
+        std::cerr << "Uso incorreto. Veja as opções abaixo:\n";
+        std::cerr << "Caso 1: ./main.out -d -m grafo.txt\n";
+        std::cerr << "Caso 2: ./main.out -d -l grafo.txt\n";
+        std::cerr << "Caso 3: ./main.out -c -m descricao.txt grafo.txt\n";
+        std::cerr << "Caso 4: ./main.out -c -l descricao.txt grafo.txt\n";
+        return 1;
+    }
+
+    std::string opcao = argv[1];
+    std::string estrutura = argv[2];
+
+    if (opcao == "-d") {
+        if (argc != 4) {
+            std::cerr << "Uso incorreto para o modo de descrição." << std::endl;
+            return 1;
         }
-        std::cout << std::endl;
-    }
+        std::string caminhoArquivo = argv[3];
+        bool usarMatriz = (estrutura == "-m");
+        carregarGrafo(caminhoArquivo, usarMatriz);
 
-    // Caso o grafo seja não direcionado, exibe a matriz linear
-    if (!grafo.eh_direcionado()) {
-        std::cout << "Matriz Linear:" << std::endl;
-        const auto& matrizLinear = grafo.get_matriz_linear();
-        for (size_t i = 0; i < matrizLinear.size(); ++i) {
-            std::cout << matrizLinear[i] << " ";
+    } else if (opcao == "-c") {
+        if (argc != 5) {
+            std::cerr << "Uso incorreto para o modo de criação." << std::endl;
+            return 1;
         }
-        std::cout << std::endl;
+        std::string caminhoDescricao = argv[3];
+        std::string caminhoSaida = argv[4];
+        bool usarMatriz = (estrutura == "-m");
+        criarGrafo(caminhoDescricao, caminhoSaida, usarMatriz);
+
+    } else {
+        std::cerr << "Opção inválida." << std::endl;
+        return 1;
     }
-
-    std::cout <<  "EH COMPLETO: " << grafo.eh_completo();
-    std::cout <<  "N conexo: " << grafo.n_conexo();
-
-
-    // Verifica articulação
-    std::cout <<std::endl;
-    std::cout << "O grafo possui articulação: " 
-              << (grafo.possui_articulacao() ? "Sim" : "Não") << std::endl;
-
-    GrafoLista grafoLista;
-
-
-    // grafoLista.adicionarVertice(1, 4);
-
-    // grafoLista.adicionarVertice(2, 2);
-    // grafoLista.adicionarVertice(2, 2);
-    // grafoLista.adicionarVertice(3, 3);
-    // grafoLista.adicionarVertice(4, 2);
-
-
-    // grafoLista.adicionarAresta(1, 4, 104);
-    // grafoLista.adicionarAresta(3, 4, 106);
-    // grafoLista.adicionarAresta(2, 4, 102);
-
-    grafoLista.carrega_grafo();
-
-    grafoLista.imprimir();
-
 
     return 0;
 }

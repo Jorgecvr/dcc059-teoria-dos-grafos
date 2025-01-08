@@ -17,15 +17,17 @@ private:
     bool verticePonderado;
     bool arestaPonderada;
 
-    VerticeEncadeado* encontraVertice(int id);
+    VerticeEncadeado* encontra_vertice(int id);
+    void adiciona_vertice(int id, int peso);
+    void adiciona_aresta(int origem, int destino, int peso);
+    void busca_profundidade(VerticeEncadeado* vertice, bool* visitados);
+    void imprimir();
 
 public:
     GrafoLista();
     ~GrafoLista();
 
-    void adicionarVertice(int id, float peso);
-    void adicionarAresta(int origem, int destino, int peso);
-    void imprimir();
+
     bool eh_bipartido() override;
     int n_conexo() override;
     int get_grau() override;
@@ -39,7 +41,6 @@ public:
     bool possui_ponte() override;
     void carrega_grafo() override;
     void novo_grafo() override;
-    void buscaEmProfundidade(VerticeEncadeado* vertice, bool* visitados);
 };
 
 #endif

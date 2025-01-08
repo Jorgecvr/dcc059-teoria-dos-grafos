@@ -1,7 +1,7 @@
 #ifndef GRAFOLISTA_H
 #define GRAFOLISTA_H
 
-#include "Grafo.h"
+#include "grafo.h"
 #include "ListaEncadeada.h"
 #include "VerticeEncadeado.h"
 #include "ArestaEncadeada.h"

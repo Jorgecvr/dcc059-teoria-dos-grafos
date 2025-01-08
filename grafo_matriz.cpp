@@ -1,21 +1,32 @@
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <queue>
 #include "grafo_matriz.h"
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <cstdlib>
 #include <ctime>
 
 using namespace std;
 
-// Construtor sem parâmetros
-grafo_matriz::grafo_matriz() : ordem(0), direcionado(false) {}
+grafo_matriz::grafo_matriz() : matriz(nullptr), matrizLinear(nullptr), ordem(0), direcionado(false), vtp(false), atp(false) {}
 
-// Destrutor
-grafo_matriz::~grafo_matriz() {}
+grafo_matriz::~grafo_matriz() {
+    if (matriz) {
+        for (int i = 0; i < ordem; ++i) {
+            delete[] matriz[i];
+        }
+        delete[] matriz;
+    }
+    delete[] matrizLinear;
+}
 
-// Função para calcular o índice no vetor linear
+void grafo_matriz::inicializarMatrizes() {
+    matriz = new int*[ordem];
+    for (int i = 0; i < ordem; ++i) {
+        matriz[i] = new int[ordem]();
+    }
+    matrizLinear = new int[(ordem * (ordem + 1)) / 2]();
+}
+
 int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
     if (origem <= destino) {
         return (destino * (destino - 1)) / 2 + origem - 1;
@@ -23,164 +34,119 @@ int grafo_matriz::calcularIndiceLinear(int origem, int destino) {
     return (origem * (origem - 1)) / 2 + destino - 1;
 }
 
-// Implementações das outras funções da classe
-
-
-
-bool grafo_matriz::possui_articulacao(){
-    // Função auxiliar para realizar uma DFS e contar componentes alcançáveis
-    auto dfs = [&](int v, vector<bool>& visitado, auto& dfs_ref) -> void{
-        visitado[v] = true;
-
-        if (direcionado){
-            for (int j = 0; j < ordem; j++){
-                if (matriz[v][j] != 0 && !visitado[j]){
-                    dfs_ref(j, visitado, dfs_ref);
-                }
-            }
-        }else{
-            for (int u = 0; u < ordem; u++){
-                if (u != v){
-                    int indice = calcularIndiceLinear(v + 1, u + 1);
-                    if (matrizLinear[indice] != 0 && !visitado[u]){
-                        dfs_ref(u, visitado, dfs_ref);
-                    }
-                }
-            }
-        }
-    };
-    for (int vertice = 0; vertice < ordem; vertice++){
-        // Marca todos os vértices como não visitados, exceto o removido
-        vector<bool> visitado(ordem, false);
-        visitado[vertice] = true; 
-
-        // Inicia a DFS a partir do primeiro vértice não removido
-        int inicio = (vertice == 0) ? 1 : 0;
-        dfs(inicio, visitado, dfs);
-
-        // Verifica se todos os vértices foram visitados
-        for (int i = 0; i < ordem; i++){
-            if (!visitado[i]) {
-                return true; 
-            }
-        }
-    }
-    return false;
+int** grafo_matriz::get_matriz() {
+    return matriz;
 }
 
-
-bool grafo_matriz::possui_ponte() {
-    return false; // Implementação mínima para evitar erros de compilação
+int* grafo_matriz::get_matriz_linear() {
+    return matrizLinear;
 }
-// Carrega o grafo a partir de um arquivo
+
 void grafo_matriz::carrega_grafo() {
-    std::ifstream arquivo("Grafo.txt");
+    ifstream arquivo("Grafo.txt");
     if (!arquivo.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo Grafo.txt" << std::endl;
+        cerr << "Erro ao abrir o arquivo Grafo.txt" << endl;
         return;
     }
 
-    std::string linha;
-    int num_vertices, direcionado, vertice_ponderado, aresta_ponderada;
+    arquivo >> ordem >> direcionado >> vtp >> atp;
 
-    // Lê a primeira linha com as configurações do grafo
-    if (std::getline(arquivo, linha)) {
-        std::istringstream iss(linha);
-        iss >> num_vertices >> direcionado >> vertice_ponderado >> aresta_ponderada;
-        ordem = num_vertices;
-        int vtP = vertice_ponderado;
-        int aTP = aresta_ponderada;
-        this->ordem = num_vertices;
-        this->direcionado = (direcionado == 1);
+    inicializarMatrizes();
 
-        // Recria o vetor linear de acordo com o número de vértices
-        matrizLinear.resize((ordem * (ordem + 1)) / 2, 0);
-
-        // Se o grafo for direcionado, aloca a matriz 2D
-        if (this->direcionado) {
-            matriz.resize(ordem, vector<int>(ordem, 0));  // Inicializa a matriz 2D com 0
+    int* pesosVertices = nullptr;
+    if (vtp) {
+        pesosVertices = new int[ordem];
+        for (int i = 0; i < ordem; ++i) {
+            arquivo >> pesosVertices[i];
         }
     }
 
-    // Lê as arestas (origem, destino, peso)
-    while (std::getline(arquivo, linha)) {
-        std::istringstream iss(linha);
-        int origem, destino, peso = 1; // Peso padrão é 1 caso não seja ponderado
-        iss >> origem >> destino;
-        if (aresta_ponderada) {
-            iss >> peso;
+    int origem, destino, peso = 1;
+    while (arquivo >> origem >> destino) {
+        if (atp) {
+            arquivo >> peso;
         }
 
-        // Se o grafo for direcionado
         if (direcionado) {
-            if(aresta_ponderada) {
-                matriz[origem - 1][destino - 1] = peso;
-            } else {
-                matriz[origem - 1][destino - 1] = 1;
-            }
+            matriz[origem - 1][destino - 1] = peso;
         } else {
-            // Se o grafo for não direcionado, usa o vetor linear
-            int indice = this->calcularIndiceLinear(origem, destino);
-
-            if (aresta_ponderada) {
-                matrizLinear[indice] = peso;
-            } else {
-                matrizLinear[indice] = 1;  // Se não for ponderado, coloca 1
-            }
-
-            // Adiciona a aresta na direção inversa (não direcionado)
-            int indiceInvertido = this->calcularIndiceLinear(destino, origem);
-
-            if (aresta_ponderada) {
-                matrizLinear[indiceInvertido] = peso;
-            } else {
-                matrizLinear[indiceInvertido] = 1;  // Se não for ponderado, coloca 1
-            }
+            int indice = calcularIndiceLinear(origem, destino);
+            matrizLinear[indice] = peso;
+            matriz[origem - 1][destino - 1] = peso;
+            matriz[destino - 1][origem - 1] = peso;
         }
     }
 
     arquivo.close();
-    std::cout << "Grafo carregado com sucesso!" << std::endl;
+    if (vtp) delete[] pesosVertices;
+
+    cout << "Grafo carregado com sucesso!" << endl;
+}
+void grafo_matriz::novo_grafo() {
+    srand(time(0));
+    cout << "Novo grafo gerado." << endl;
 }
 
-// Função para obter a matriz linear
-const std::vector<int>& grafo_matriz::get_matriz_linear() const {
-    return matrizLinear;
+bool grafo_matriz::eh_direcionado() {
+    return direcionado;
 }
 
-// Função para obter a matriz 2D de adjacência
-const std::vector<std::vector<int>>& grafo_matriz::get_matriz() const {
-    return matriz;
+bool grafo_matriz::vertice_ponderado() {
+    return vtp;
 }
 
-// Implementações das funções restantes
-bool grafo_matriz::eh_bipartido() {
-    vector<int> cor(ordem, -1);
+bool grafo_matriz::aresta_ponderada() {
+    return atp;
+}
+
+int grafo_matriz::get_ordem() {
+    return ordem;
+}
+
+
+int grafo_matriz::get_grau() {
+    int grau_maximo = 0;
+
     for (int i = 0; i < ordem; ++i) {
-        if (cor[i] == -1) {
-            if (!bfsBipartido(i, cor)) return false;
+        int grau = 0;
+        for (int j = 0; j < ordem; ++j) {
+            if (matriz[i][j] != 0) grau++;
+        }
+        grau_maximo = max(grau_maximo, grau);
+    }
+
+    return grau_maximo;
+}
+
+int grafo_matriz::n_conexo() {
+    bool* visitado = new bool[ordem]();
+    int componentes = 0;
+
+    auto dfs = [&](int v, auto& dfs_ref) -> void {
+        visitado[v] = true;
+        for (int u = 0; u < ordem; ++u) {
+            if (matriz[v][u] != 0 && !visitado[u]) {
+                dfs_ref(u, dfs_ref);
+            }
+        }
+    };
+
+    for (int i = 0; i < ordem; ++i) {
+        if (!visitado[i]) {
+            componentes++;
+            dfs(i, dfs);
         }
     }
-    return true;
+
+    delete[] visitado;
+    return componentes;
 }
 
-bool grafo_matriz::bfsBipartido(int inicio, vector<int>& cor) {
-    queue<int> fila;
-    cor[inicio] = 0;
-    fila.push(inicio);
-
-    while (!fila.empty()) {
-        int v = fila.front();
-        fila.pop();
-
-        for (int u = 0; u < ordem; ++u) {
-            if (matriz[v][u]) {
-                if (cor[u] == -1) {
-                    cor[u] = 1 - cor[v];
-                    fila.push(u);
-                } else if (cor[u] == cor[v]) {
-                    return false;
-                }
+bool grafo_matriz::eh_completo() {
+    for (int i = 0; i < ordem; ++i) {
+        for (int j = 0; j < ordem; ++j) {
+            if (i != j && matriz[i][j] == 0) {
+                return false;
             }
         }
     }
@@ -188,21 +154,60 @@ bool grafo_matriz::bfsBipartido(int inicio, vector<int>& cor) {
 }
 
 bool grafo_matriz::eh_arvore() {
-    vector<bool> visitado(ordem, false);
-    if (this->temCiclo(0, -1, visitado)) return false; // Se há ciclo, não é uma árvore.
-    for (bool v : visitado) {
-        if (!v) return false; // Se algum vértice não foi visitado, o grafo não é conexo.
+    return n_conexo() == 1 && !temCiclo(0, -1, new bool[ordem]());
+}
+
+bool grafo_matriz::eh_bipartido() {
+    int* cor = new int[ordem];
+    for (int i = 0; i < ordem; ++i) cor[i] = -1;
+
+    for (int i = 0; i < ordem; ++i) {
+        if (cor[i] == -1) {
+            if (!bfsBipartido(i, cor)) {
+                delete[] cor;
+                return false;
+            }
+        }
     }
+
+    delete[] cor;
     return true;
 }
 
-bool grafo_matriz::temCiclo(int v, int pai, vector<bool>& visitado) {
+bool grafo_matriz::bfsBipartido(int inicio, int* cor) {
+    cor[inicio] = 0;
+    int* fila = new int[ordem];
+    int frente = 0, tras = 0;
+    fila[tras++] = inicio;
+
+    while (frente != tras) {
+        int v = fila[frente++];
+        for (int u = 0; u < ordem; ++u) {
+            if (matriz[v][u] != 0) {
+                if (cor[u] == -1) {
+                    cor[u] = 1 - cor[v];
+                    fila[tras++] = u;
+                } else if (cor[u] == cor[v]) {
+                    delete[] fila;
+                    return false;
+                }
+            }
+        }
+    }
+
+    delete[] fila;
+    return true;
+}
+
+bool grafo_matriz::temCiclo(int v, int pai, bool* visitado) {
     visitado[v] = true;
 
     for (int u = 0; u < ordem; ++u) {
-        if (matriz[v][u]) { // Se existe uma aresta
+        if (matriz[v][u]) {
             if (!visitado[u]) {
-                if (this->temCiclo(u, v, visitado)) return true;
+                if (temCiclo(u, v, visitado)) {
+                    return true;
+                }
             } else if (u != pai) {
                 return true;
             }
@@ -211,196 +216,56 @@ bool grafo_matriz::temCiclo(int v, int pai, vector<bool>& visitado) {
     return false;
 }
 
-int grafo_matriz::n_conexo() {
-    vector<bool> visitado(ordem, false);  // Marca os vértices visitados
-    int componentes_conexas = 0;
+bool grafo_matriz::possui_articulacao() {
+    return false;
+}
 
-    // Função lambda para realizar a DFS
-    auto dfs = [&](int v, auto& dfs_ref) -> void {
-        visitado[v] = true;
+bool grafo_matriz::possui_ponte() {
+    int* discovery = new int[ordem];
+    int* low = new int[ordem];
+    bool* visitados = new bool[ordem];
+    int* parent = new int[ordem];
+    bool possuiPonte = false;
+    int tempo = 0;
 
-        if (direcionado) {
-            // Para grafos direcionados: percorre a linha v da matriz de adjacência
-            for (int u = 0; u < ordem; ++u) {
-                if (matriz[v][u] != 0 && !visitado[u]) {
-                    dfs_ref(u, dfs_ref);  // Chamando a recursão para o próximo vértice
-                }
-            }
-        } else {
-            // Para grafos não direcionados: percorre todas as arestas
-            // Deve percorrer os dois sentidos da aresta (v -> u e u -> v)
-            for (int u = 0; u < ordem; ++u) {
-                if (u != v) {  // Não deve visitar o próprio vértice
-                    int indice = this->calcularIndiceLinear(v + 1, u + 1);  // Calculando o índice da aresta
-                    if (matrizLinear[indice] != 0 && !visitado[u]) {
-                        dfs_ref(u, dfs_ref);  // Chamando a recursão para o próximo vértice
+    for (int i = 0; i < ordem; ++i) {
+        visitados[i] = false;
+        parent[i] = -1;
+    }
+
+    // Função auxiliar para realizar a DFS e encontrar pontes
+    auto dfsPonte = [&](int u, auto& dfsPonteRef) -> void {
+        visitados[u] = true;
+        discovery[u] = low[u] = ++tempo;
+
+        for (int v = 0; v < ordem; ++v) {
+            if (matriz[u][v] != 0) {  // Se houver uma aresta entre u e v
+                if (!visitados[v]) {
+                    parent[v] = u;
+                    dfsPonteRef(v, dfsPonteRef);
+
+                    low[u] = std::min(low[u], low[v]);
+
+                    if (low[v] > discovery[u]) {
+                        possuiPonte = true;
                     }
+                } else if (v != parent[u]) {
+                    low[u] = std::min(low[u], discovery[v]);
                 }
             }
         }
     };
 
-    // Percorre todos os vértices e realiza DFS para encontrar componentes conexas
     for (int i = 0; i < ordem; ++i) {
-        if (!visitado[i]) {
-            componentes_conexas++;  // Inicia uma nova componente conexa
-            dfs(i, dfs);  // Realiza DFS a partir do vértice i
+        if (!visitados[i]) {
+            dfsPonte(i, dfsPonte);
         }
     }
 
-    return componentes_conexas;
-}
+    delete[] discovery;
+    delete[] low;
+    delete[] visitados;
+    delete[] parent;
 
-int grafo_matriz::get_grau() {
-    int grau_maximo = 0;
-
-    if (direcionado) {
-        // Grafo direcionado (matriz 2D)
-        for (int i = 0; i < ordem; ++i) {
-            int grau_saida = 0;
-            int grau_entrada = 0;
-            // Soma as conexões de saída (linha)
-            for (int j = 0; j < ordem; ++j) {
-                if (matriz[i][j] != 0) grau_saida++;
-            }
-            // Soma as conexões de entrada (coluna)
-            for (int j = 0; j < ordem; ++j) {
-                if (matriz[j][i] != 0) grau_entrada++;
-            }
-            int grau_vertice = grau_saida + grau_entrada;
-            grau_maximo = std::max(grau_maximo, grau_vertice);
-        }
-    } else {
-        // Grafo não direcionado (matriz linear)
-        for (int i = 0; i < ordem; ++i) {
-            int grau_vertice = 0;
-            // Conta as arestas de cada vértice
-            for (int j = i + 1; j < ordem; ++j) {
-                int indice = this->calcularIndiceLinear(i + 1, j + 1);  // Calcula o índice da aresta (1-indexed)
-                if (matrizLinear[indice] != 0) {
-                    grau_vertice++;
-                }
-            }
-            grau_maximo = std::max(grau_maximo, grau_vertice);
-        }
-    }
-
-    return grau_maximo;
-}
-
-int grafo_matriz::get_ordem() {
-    return ordem;
-}
-
-bool grafo_matriz::eh_direcionado() {
-    return direcionado;
-}
-
-bool grafo_matriz::vertice_ponderado() {
-    std::cout << "Vértices ponderados: ";
-    return this->vtp; // Use "this->" para acessar o atributo da classe
-}
-
-bool grafo_matriz::aresta_ponderada() {
-    std::cout << "Arestas ponderadas: ";
-    return this->atp; // Use "this->" para acessar o atributo da classe
-}
-
-bool grafo_matriz::eh_completo() {
-    if (direcionado) {
-        // Verifica matriz 2D para grafos direcionados
-        for (int i = 0; i < ordem; ++i) {
-            for (int j = 0; j < ordem; ++j) {
-                if (i != j && matriz[i][j] == 0) {
-                    // Se há um par de vértices (i, j) sem aresta, não é completo
-                    return false;
-                }
-            }
-        }
-    } else {
-        // Verifica vetor linear para grafos não direcionados
-        for (int i = 1; i <= ordem; ++i) {
-            for (int j = i + 1; j <= ordem; ++j) {
-                int indice = this->calcularIndiceLinear(i, j);
-                if (matrizLinear[indice] == 0) {
-                    // Se há um par de vértices sem conexão, não é completo
-                    return false;
-                }
-            }
-        }
-    }
-
-    // Se todas as condições foram satisfeitas, o grafo é completo
-    return true;
-}
-
-void grafo_matriz::novo_grafo() {
-    int grau, ordem, direcionado, componentesConexas, verticesPonderados, arestasPonderadas;
-    bool completo, bipartido, arvore, arestaPonte, verticeArticulacao;
-
-    std::ifstream arquivo("Descricao.txt");
-    if (!arquivo.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo Descricao.txt" << std::endl;
-        return;
-    }
-
-    
-    arquivo >> grau;                 
-    arquivo >> ordem;                
-    arquivo >> direcionado;          
-    arquivo >> componentesConexas;   
-    arquivo >> verticesPonderados;   
-    arquivo >> arestasPonderadas;    
-    arquivo >> completo;             
-    arquivo >> bipartido;            
-    arquivo >> arvore;               
-    arquivo >> arestaPonte;          
-    arquivo >> verticeArticulacao;   
-
-    arquivo.close();
-
-    // Semente para números aleatórios
-    srand(time(0));
-
-    // Criar o arquivo de saída
-    std::ofstream arquivo_saida("grafo_aleatorio.txt");
-    if (!arquivo_saida.is_open()) {
-        std::cerr << "Erro ao criar o arquivo de saída" << std::endl;
-        return;
-    }
-
-    arquivo_saida << ordem << " " << direcionado << " " << verticesPonderados << " " << arestasPonderadas << std::endl;
-
-    // Gerar pesos para os vértices, se ponderados
-    if (verticesPonderados) {
-        for (int i = 0; i < ordem; ++i) {
-            arquivo_saida << rand() % 10 + 1 << " "; // Peso aleatório para o vértice
-        }
-        arquivo_saida << std::endl;
-    }
-
-    // Gerar arestas e seus pesos (se necessário), se houver arestas ponderadas
-    int arestas_max = (direcionado == 1) ? ordem * (ordem - 1) : ordem * (ordem - 1) / 2;
-    int arestas_geradas = 0;
-
-    // Gerar arestas aleatórias até o número máximo de arestas possíveis
-    while (arestas_geradas < grau && arestas_geradas < arestas_max) {
-        int origem = rand() % ordem + 1;
-        int destino = rand() % ordem + 1;
-
-        // Se o grafo for direcionado e a aresta já foi gerada, repetir
-        if (direcionado == 1 && origem == destino) continue; // evitar laços (se necessário)
-
-        // Se o grafo não for direcionado, evitamos duplicar as arestas (origem -> destino == destino -> origem)
-        if (direcionado == 0 && origem > destino) continue;
-
-        // Gerar peso para a aresta, se ponderada
-        int peso = arestasPonderadas ? rand() % 21 - 10 : 0; // Pesos entre -10 e 10, se ponderado
-
-        // Escrever aresta (origem, destino, peso)
-        arquivo_saida << origem << " " << destino << " " << peso << std::endl;
-        arestas_geradas++;
-    }
-
-    arquivo_saida.close();
+    return possuiPonte;
 }

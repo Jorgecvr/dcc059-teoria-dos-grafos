@@ -5,8 +5,6 @@
 #include "ListaEncadeada.h"
 #include "ArestaEncadeada.h"
 
-
-
 class VerticeEncadeado {
 private:
     int id;
@@ -17,7 +15,7 @@ private:
 
 public:
     VerticeEncadeado(int id, int peso);
-    int getConexoes() const ;
+
     int getId() const;
     int getPeso() const;
     int getGrau() const;
@@ -25,12 +23,6 @@ public:
     void setProximo(VerticeEncadeado* novoProximo);
     void setConexao(VerticeEncadeado* verticeDestino, int pesoAresta);
     ArestaEncadeada* getPrimeiraConexao();
-
-    //rograma para fazer possui ponte funcionar
-    void decrementarGrau();
-    void removerConexao(VerticeEncadeado* destino);
-    void setInicio(ArestaEncadeada* novoInicio);
-
 
     friend std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice);
 };

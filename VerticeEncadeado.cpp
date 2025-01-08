@@ -31,9 +31,18 @@ ArestaEncadeada* VerticeEncadeado::getPrimeiraConexao() {
     return conexoes->getInicio();
 }
 
+ListaEncadeada<ArestaEncadeada>* VerticeEncadeado::getConexoes() {
+    return conexoes;
+}
+
 void VerticeEncadeado::setProximo(VerticeEncadeado* novoProximo) {
     proximo = novoProximo;
 }
+
+void VerticeEncadeado::setConexoes(ListaEncadeada<ArestaEncadeada>* novasConexoes) {
+    conexoes = novasConexoes;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice) {
     os << "VerticeEncadeado " << vertice.id

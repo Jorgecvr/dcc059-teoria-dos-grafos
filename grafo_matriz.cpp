@@ -72,8 +72,6 @@ void grafo_matriz::carrega_grafo() {
         } else {
             int indice = calcularIndiceLinear(origem, destino);
             matrizLinear[indice] = peso;
-            // matriz[origem - 1][destino - 1] = peso;
-            // matriz[destino - 1][origem - 1] = peso;
         }
     }
 
@@ -242,7 +240,7 @@ bool grafo_matriz::eh_completo() {
     } else {
         // Grafo não direcionado: usa matriz linear
         for (int i = 0; i < ordem; ++i) {
-            for (int j = i + 1; j < ordem; ++j) { // Só verifica a metade superior
+            for (int j = i + 1; j < ordem; ++j) { 
                 int indice = calcularIndiceLinear(i + 1, j + 1);
                 if (matrizLinear[indice] == 0) {
                     return false;

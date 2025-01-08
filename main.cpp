@@ -27,7 +27,7 @@ void carregarGrafo(const std::string &caminhoArquivo, bool usarMatriz) {
     if (usarMatriz) {
         graph = new grafo_matriz();
     } else {
-        //graph = new GrafoLista();
+        graph = new GrafoLista();
     }
     graph->carrega_grafo();
     imprimirDescricaoGrafo(graph);
@@ -39,7 +39,7 @@ void criarGrafo(const std::string &caminhoDescricao, const std::string &caminhoS
     if (usarMatriz) {
         graph = new grafo_matriz();
     } else {
-        //graph = new GrafoLista();
+        graph = new GrafoLista();
     }
 
 

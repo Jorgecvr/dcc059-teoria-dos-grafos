@@ -23,6 +23,8 @@ public:
     void setProximo(VerticeEncadeado* novoProximo);
     void setConexao(VerticeEncadeado* verticeDestino, int pesoAresta);
     ArestaEncadeada* getPrimeiraConexao();
+    ListaEncadeada<ArestaEncadeada>* getConexoes();
+    void setConexoes(ListaEncadeada<ArestaEncadeada>* novasConexoes);
 
     friend std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice);
 };

@@ -53,7 +53,7 @@ void GrafoLista::carrega_grafo() {
         iss >> ordem >> direcionadoInput >> verticePonderado >> arestaPonderada;
         direcionado = direcionadoInput;
         for (int i = 1; i <= ordem; i++) {
-            adicionarVertice(i, 0);
+            adiciona_vertice(i, 0);
         }
     }
 
@@ -64,19 +64,19 @@ void GrafoLista::carrega_grafo() {
         if (arestaPonderada) {
             iss >> peso;
         }
-        adicionarAresta(origem, destino, peso);
+        adiciona_aresta(origem, destino, peso);
     }
     arquivo.close();
 }
 
-void GrafoLista::adicionarVertice(int id, float peso) {
+void GrafoLista::adiciona_vertice(int id, int peso) {
     VerticeEncadeado* novo = new VerticeEncadeado(id, peso);
     vertices->adicionar(novo);
 }
 
-void GrafoLista::adicionarAresta(int origem, int destino, int peso) {
-    VerticeEncadeado* verticeOrigem = encontraVertice(origem);
-    VerticeEncadeado* verticeDestino = encontraVertice(destino);
+void GrafoLista::adiciona_aresta(int origem, int destino, int peso) {
+    VerticeEncadeado* verticeOrigem = encontra_vertice(origem);
+    VerticeEncadeado* verticeDestino = encontra_vertice(destino);
     if (verticeOrigem && verticeDestino) {
         ArestaEncadeada* novaAresta = new ArestaEncadeada(verticeOrigem, verticeDestino, peso);
         arestas->adicionar(novaAresta);
@@ -127,7 +127,7 @@ bool GrafoLista::eh_arvore() {
         }
     };
 
-    VerticeEncadeado* verticeInicial = encontraVertice(0);
+    VerticeEncadeado* verticeInicial = encontra_vertice(0);
     dfs(verticeInicial, nullptr, dfs);
 
     for (int i = 0; i < ordem; ++i) {
@@ -191,7 +191,7 @@ bool GrafoLista::possui_articulacao() {
 
     for (int i = 0; i < ordem; i++) {
         if (!visitados[i]) {
-            dfsArticulacao(encontraVertice(i), dfsArticulacao);
+            dfsArticulacao(encontra_vertice(i), dfsArticulacao);
         }
     }
 
@@ -220,7 +220,7 @@ void GrafoLista::novo_grafo() {
     cout << "Novo grafo gerado." << endl;
 }
 
-VerticeEncadeado* GrafoLista::encontraVertice(int id) {
+VerticeEncadeado* GrafoLista::encontra_vertice(int id) {
     VerticeEncadeado* atual = vertices->getInicio();
     while (atual != nullptr) {
         if (atual->getId() == id) {
@@ -231,13 +231,13 @@ VerticeEncadeado* GrafoLista::encontraVertice(int id) {
     return nullptr;
 }
 
-void GrafoLista::buscaEmProfundidade(VerticeEncadeado* vertice, bool* visitados) {
+void GrafoLista::busca_profundidade(VerticeEncadeado* vertice, bool* visitados) {
     visitados[vertice->getId()] = true;
     ArestaEncadeada* aresta = vertice->getPrimeiraConexao();
     while (aresta != nullptr) {
         VerticeEncadeado* vizinho = aresta->getDestino();
         if (!visitados[vizinho->getId()]) {
-            buscaEmProfundidade(vizinho, visitados);
+            busca_profundidade(vizinho, visitados);
         }
         aresta = aresta->getProximo();
     }

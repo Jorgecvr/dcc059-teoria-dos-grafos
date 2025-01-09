@@ -272,6 +272,35 @@ bool GrafoLista::eh_arvore() {
 
 
 bool GrafoLista::possui_articulacao() {
+    VerticeEncadeado* verticeAtual = vertices->getInicio();
+
+    while (verticeAtual != nullptr) {
+        int idAtual = verticeAtual->getId();
+
+        bool* visitados = new bool[ordem + 1];
+        for (int i = 1; i <= ordem; i++) {
+            visitados[i] = false;
+        }
+
+        int componentesConexos = 0;
+        visitados[idAtual] = true;
+
+        VerticeEncadeado* vertice = vertices->getInicio();
+        while (vertice != nullptr) {
+            if (!visitados[vertice->getId()]) {
+                buscaEmProfundidade(vertice, visitados);
+                componentesConexos++;
+            }
+            vertice = vertice->getProximo();
+        }
+
+        delete[] visitados;
+
+        if (componentesConexos > 1)
+            return true;
+
+        verticeAtual = verticeAtual->getProximo();
+    }
     return false;
 }
 

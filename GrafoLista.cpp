@@ -304,7 +304,33 @@ bool GrafoLista::possui_articulacao() {
     return false;
 }
 
-bool GrafoLista::possui_ponte() {
+
+
+bool GrafoLista::possui_ponte(){
+
+    ArestaEncadeada* atual = arestas->getInicio();
+    while (atual != nullptr) {
+        VerticeEncadeado* origem = atual->getOrigem();
+        VerticeEncadeado* destino = atual->getDestino();
+
+        int componentesAntes = n_conexo();
+        
+        int pesoAresta = origem->removeConexao(destino);
+        if (!eh_direcionado()){
+            destino->removeConexao(origem);
+        }
+        int componentesDepois = n_conexo(); 
+
+        origem->setConexao(destino, pesoAresta, false);
+        if (!eh_direcionado()){
+            destino->setConexao(origem, pesoAresta, true);
+        }
+        if (componentesDepois > componentesAntes) {
+            return true;
+        }
+
+        atual = atual->getProximo();
+    }
     return false;
 }
 

@@ -29,12 +29,24 @@ void VerticeEncadeado::setConexao(VerticeEncadeado* verticeDestino, int pesoAres
 }
 
 ArestaEncadeada* VerticeEncadeado::getPrimeiraConexao() {
-
     return conexoes->getInicio();
 }
 
 ListaEncadeada<ArestaEncadeada>* VerticeEncadeado::getConexoes() {
     return conexoes;
+}
+
+ArestaEncadeada* VerticeEncadeado::getConexao(int origem, int destino) {
+    ArestaEncadeada* arestaAtual = conexoes->getInicio();
+    
+    while(arestaAtual != nullptr) {
+        if(arestaAtual->getOrigem()->getId() == origem && arestaAtual->getDestino()->getId() == destino) 
+            break;
+ 
+        arestaAtual = arestaAtual->getProximo();
+    }
+    return arestaAtual;
+
 }
 
 void VerticeEncadeado::setProximo(VerticeEncadeado* novoProximo) {
@@ -43,6 +55,18 @@ void VerticeEncadeado::setProximo(VerticeEncadeado* novoProximo) {
 
 void VerticeEncadeado::setConexoes(ListaEncadeada<ArestaEncadeada>* novasConexoes) {
     conexoes = novasConexoes;
+}
+
+int VerticeEncadeado::removeConexao(VerticeEncadeado* destino) {
+
+    ArestaEncadeada* aresta = getConexao(id, destino->getId());
+    if(aresta == nullptr)
+        return 0;
+        
+    int pesoAresta = aresta->getPeso();
+    conexoes->remover(aresta);
+    return pesoAresta;
+
 }
 
 

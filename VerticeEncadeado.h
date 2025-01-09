@@ -25,6 +25,8 @@ public:
     ArestaEncadeada* getPrimeiraConexao();
     ListaEncadeada<ArestaEncadeada>* getConexoes();
     void setConexoes(ListaEncadeada<ArestaEncadeada>* novasConexoes);
+    int removeConexao(VerticeEncadeado* destino);
+    ArestaEncadeada* getConexao(int origem, int destino);
 
     friend std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice);
 };

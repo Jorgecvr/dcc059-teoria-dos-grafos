@@ -20,8 +20,6 @@ private:
     bool verticePonderado;
     bool arestaPonderada;
 
-
-
 public:
     GrafoLista();
 
@@ -73,8 +71,12 @@ public:
 
     void carrega_grafo() override;
     void novo_grafo() override;
+    // void novo_grafo(const std::string& descricaoArquivo) override;
 
     void buscaEmProfundidade(VerticeEncadeado* vertice, bool* visitados);
+
+    void removerAresta(int origem, int destino);
+    bool validarRestricoes();
 
     ~GrafoLista();
 };

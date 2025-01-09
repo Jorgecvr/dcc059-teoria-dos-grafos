@@ -310,6 +310,144 @@ bool GrafoLista::possui_ponte() {
 
 void GrafoLista::novo_grafo() {}
 
+// void GrafoLista::novo_grafo(const std::string& descricaoArquivo) {
+//     std::ifstream arquivo(descricaoArquivo);
+//     if (!arquivo.is_open()) {
+//         cerr << "Erro ao abrir o arquivo: " << descricaoArquivo << endl;
+//         return;
+//     }
+
+
+//     int ordem, grauMaximo, direcionado, componentesConexas, verticesPonderados, arestasPonderadas;
+//     int completo, bipartido, arvore, possuiPonte, possuiArticulacao;
+
+//     arquivo >> ordem >> grauMaximo >> direcionado >> componentesConexas >> verticesPonderados 
+//             >> arestasPonderadas >> completo >> bipartido >> arvore >> possuiPonte >> possuiArticulacao;
+
+//     arquivo.close();
+
+//     this->ordem = ordem;
+//     this->set_eh_direcionado(direcionado == 1);
+//     this->set_vertice_ponderado(verticesPonderados == 1);
+//     this->set_aresta_ponderada(arestasPonderadas == 1);
+
+//     srand(time(0)); 
+
+  
+//     delete vertices;
+//     delete arestas;
+//     vertices = new ListaEncadeada<VerticeEncadeado>();
+//     arestas = new ListaEncadeada<ArestaEncadeada>();
+
+   
+//     for (int i = 1; i <= ordem; ++i) {
+//         int peso = vertice_ponderado() ? (rand() % 10 + 1) : 0;
+//         adicionarVertice(i, peso);
+//     }
+
+  
+//     int maxTentativas = 10000;
+//     int tentativas = 0;
+
+//     while (tentativas < maxTentativas) {
+//         int origem = rand() % ordem + 1;
+//         int destino = rand() % ordem + 1;
+
+//         if (origem == destino) continue;
+
+//         int peso = aresta_ponderada() ? (rand() % 10 + 1) : 1;
+
+//         adicionarAresta(origem, destino, peso);
+
+    
+//         if (get_grau() > grauMaximo || 
+//             n_conexo() != componentesConexas || 
+//             (completo && !eh_completo()) || 
+//             (bipartido && !eh_bipartido()) || 
+//             (arvore && !eh_arvore()) || 
+//             (possuiPonte && !possui_ponte()) || 
+//             (possuiArticulacao && !possui_articulacao())) {
+//             removerAresta(origem, destino); // Reverter aresta
+//         }
+
+
+//         if (n_conexo() == componentesConexas &&
+//             get_grau() <= grauMaximo &&
+//             (!completo || eh_completo()) &&
+//             (!bipartido || eh_bipartido()) &&
+//             (!arvore || eh_arvore()) &&
+//             (!possuiPonte || possui_ponte()) &&
+//             (!possuiArticulacao || possui_articulacao())) {
+//             break;
+//         }
+
+//         tentativas++;
+//     }
+
+//     if (tentativas >= maxTentativas) {
+//         cerr << "Erro: Não foi possível gerar um grafo válido dentro do limite de tentativas." << endl;
+//         return;
+//     }
+
+
+//     static int grafoId = 1;
+//     string nomeArquivo = "NovoGrafo" + to_string(grafoId++) + ".txt";
+//     ofstream arquivoSaida(nomeArquivo);
+
+//     if (!arquivoSaida.is_open()) {
+//         cerr << "Erro ao criar o arquivo: " << nomeArquivo << endl;
+//         return;
+//     }
+
+//     arquivoSaida << ordem << " " << direcionado << " " << verticesPonderados << " " << arestasPonderadas << endl;
+
+//     if (verticesPonderados) {
+//         VerticeEncadeado* verticeAtual = vertices->getInicio();
+//         while (verticeAtual != nullptr) {
+//             arquivoSaida << verticeAtual->getPeso() << " ";
+//             verticeAtual = verticeAtual->getProximo();
+//         }
+//         arquivoSaida << endl;
+//     }
+
+//     ArestaEncadeada* arestaAtual = arestas->getInicio();
+//     while (arestaAtual != nullptr) {
+//         arquivoSaida << arestaAtual->getOrigem()->getId() << " " << arestaAtual->getDestino()->getId();
+//         if (arestasPonderadas) {
+//             arquivoSaida << " " << arestaAtual->getPeso();
+//         }
+//         arquivoSaida << endl;
+//         arestaAtual = arestaAtual->getProximo();
+//     }
+
+//     arquivoSaida.close();
+//     cout << "Novo grafo gerado e salvo em: " << nomeArquivo << endl;
+// }
+
+// void GrafoLista::removerAresta(int origem, int destino) {
+//     if (!arestas) {
+//         cerr << "Erro: Lista de arestas não inicializada." << endl;
+//         return;
+//     }
+
+//     ArestaEncadeada* arestaAtual = arestas->getInicio();
+//     ArestaEncadeada* anterior = nullptr;
+
+//     while (arestaAtual != nullptr) {
+//         if (arestaAtual->getOrigem()->getId() == origem && arestaAtual->getDestino()->getId() == destino) {
+//             if (anterior == nullptr) {
+//                 arestas->setInicio(arestaAtual->getProximo());
+//             } else {
+//                 anterior->setProximo(arestaAtual->getProximo());
+//             }
+//             delete arestaAtual;
+//             return;
+//         }
+//         anterior = arestaAtual;
+//         arestaAtual = arestaAtual->getProximo();
+//     }
+// }
+
 GrafoLista::~GrafoLista() {
     delete vertices;
     delete arestas;

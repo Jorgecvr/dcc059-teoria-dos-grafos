@@ -46,6 +46,10 @@ public:
             atual = proximo;
         }
     }
+
+    // void setInicio(T* novoInicio) {
+    // primeiro = novoInicio;
+    // }
 };
 
 #endif

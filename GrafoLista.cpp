@@ -123,9 +123,9 @@ void GrafoLista::adicionarAresta(int origem, int destino, int peso) {
 
     ArestaEncadeada* novaAresta = new ArestaEncadeada(verticeOrigem, verticeDestino, peso);
 
-    verticeOrigem->setConexao(verticeDestino, peso);
+    verticeOrigem->setConexao(verticeDestino, peso, false);
     if (!eh_direcionado())
-        verticeDestino->setConexao(verticeOrigem, peso);
+        verticeDestino->setConexao(verticeOrigem, peso, true);
     arestas->adicionar(novaAresta);
 }
 

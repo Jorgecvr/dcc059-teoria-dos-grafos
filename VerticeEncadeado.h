@@ -21,7 +21,7 @@ public:
     int getGrau() const;
     VerticeEncadeado* getProximo() const;
     void setProximo(VerticeEncadeado* novoProximo);
-    void setConexao(VerticeEncadeado* verticeDestino, int pesoAresta);
+    void setConexao(VerticeEncadeado* verticeDestino, int pesoAresta, bool arestaDuplicada);
     ArestaEncadeada* getPrimeiraConexao();
     ListaEncadeada<ArestaEncadeada>* getConexoes();
     void setConexoes(ListaEncadeada<ArestaEncadeada>* novasConexoes);

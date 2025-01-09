@@ -45,6 +45,30 @@ void VerticeEncadeado::setConexoes(ListaEncadeada<ArestaEncadeada>* novasConexoe
     conexoes = novasConexoes;
 }
 
+ArestaEncadeada* VerticeEncadeado::getConexao(int origem, int destino) {
+    ArestaEncadeada* arestaAtual = conexoes->getInicio();
+    
+    while(arestaAtual != nullptr) {
+        if(arestaAtual->getOrigem()->getId() == origem && arestaAtual->getDestino()->getId() == destino) 
+            break;
+ 
+        arestaAtual = arestaAtual->getProximo();
+    }
+    return arestaAtual;
+
+}
+
+int VerticeEncadeado::removeConexao(VerticeEncadeado* destino) {
+
+    ArestaEncadeada* aresta = getConexao(id, destino->getId());
+    if(aresta == nullptr)
+        return 0;
+        
+    int pesoAresta = aresta->getPeso();
+    conexoes->remover(aresta);
+    return pesoAresta;
+
+}
 
 std::ostream& operator<<(std::ostream& os, const VerticeEncadeado& vertice) {
     os << "VerticeEncadeado " << vertice.id

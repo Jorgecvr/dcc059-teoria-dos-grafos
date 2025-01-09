@@ -50,6 +50,35 @@ public:
     // void setInicio(T* novoInicio) {
     // primeiro = novoInicio;
     // }
+
+    void remover(T* noParaRemover) {
+        if (primeiro == nullptr || noParaRemover == nullptr) {
+            return;
+        }
+
+        if (primeiro == noParaRemover) {
+            primeiro = primeiro->getProximo();
+            if (primeiro == nullptr) {
+                ultimo = nullptr;
+            }
+            delete noParaRemover;
+            return;
+        }
+
+        T* atual = primeiro;
+        while (atual->getProximo() != nullptr && atual->getProximo() != noParaRemover) {
+            atual = atual->getProximo();
+        }
+
+        if (atual->getProximo() == noParaRemover) {
+            T* proximo = noParaRemover->getProximo();
+            atual->setProximo(proximo); 
+
+            if (noParaRemover == ultimo) {
+                ultimo = atual;
+            }
+        }
+    }
 };
 
 #endif
